@@ -1,0 +1,75 @@
+table_name,column_name,data_type,data_explaination,data_assumption,data_example
+customers,customer_id,int,Unique identifier for each customer,Sequentially assigned starting from 1,1001
+customers,age,int,Age of the customer in years,Generated based on job type with anomalies injected,35
+customers,job,string,Type of job held by the customer,Randomly assigned based on probabilities,technician
+customers,marital,string,Marital status of the customer,Assigned based on age distribution,married
+customers,education,string,Education level attained by the customer,Generated based on job-specific probabilities,tertiary
+customers,credit_default,string,Indicates if the customer has defaulted on credit,"Probabilities based on education, marital status, and account age",no
+customers,customer_segment,string,Customer segmentation category,"Assigned based on age, job, education, and region",Middle-Market
+customers,region,string,Region where the customer resides,Randomly assigned with predefined probabilities,Urban
+customers,income,int,Monthly income in USD,Generated based on job category with occasional anomalies,4500
+customers,created_at,datetime,Date the customer account was created,Skewed towards recent dates with anomalies allowed,2022-06-15
+customers,credit_card,string,Ownership of a credit card,Probability influenced by income and segment,yes
+customers,personal_loan,string,Ownership of a personal loan,Probability influenced by income and segment,no
+customers,mortgage,string,Ownership of a mortgage,Probability influenced by marital status and income,yes
+customers,savings_account,string,Ownership of a savings account,Probability influenced by employment status,yes
+customers,investment_product,string,Ownership of investment products,Probability influenced by income and segment,no
+customers,auto_loan,string,Ownership of an auto loan,Probability influenced by income and region,no
+customers,wealth_management,string,Ownership of wealth management products,Probability influenced by income and job,yes
+transactions_summary,customer_id,int,Link to the customer ID from customers table,Foreign key reference,1001
+transactions_summary,days_since_last_transaction,int,Days since last transaction,Generated using overall activity multipliers,15
+transactions_summary,account_lifetime_days,int,Total days since account creation,Calculated based on account creation date,450
+transactions_summary,current_balance,float,Current balance in USD,Generated as a multiple of income,12000.50
+transactions_summary,peak_month,int,Month with the highest spending,Randomly assigned with seasonal bias,12
+transactions_summary,peak_month_spending,float,Total spending in the peak month,Calculated from total annual spending,2500.75
+transactions_summary,peak_month_frequency,int,Number of transactions in peak month,Generated based on transaction frequency,21
+transactions_summary,total_transactions_3m,int,Total number of transactions in the last 3 months,Generated from Poisson distribution,90
+transactions_summary,total_transaction_amount_3m,float,Total transaction amount in the last 3 months,Calculated based on frequency and income,4500.25
+transactions_summary,average_transaction_amount_3m,float,Average transaction amount in the last 3 months,Calculated as total amount divided by transactions,50.0
+transactions_summary,transaction_frequency_3m,float,Transaction frequency per month in the last 3 months,Derived from total transactions,30.0
+transactions_summary,high_value_transaction_rate_3m,float,Proportion of high-value transactions in 3 months,Derived from income levels,0.15
+transactions_summary,online_transaction_ratio_3m,float,Proportion of online transactions,Determined by age and job category,0.75
+transactions_summary,total_transactions_6m,int,Total number of transactions in the last 6 months,Generated from Poisson distribution,180
+transactions_summary,total_transaction_amount_6m,float,Total transaction amount in the last 6 months,Calculated based on frequency and income,8700.50
+transactions_summary,average_transaction_amount_6m,float,Average transaction amount in the last 6 months,Calculated as total amount divided by transactions,48.33
+transactions_summary,transaction_frequency_6m,float,Transaction frequency per month in the last 6 months,Derived from total transactions,30.0
+transactions_summary,high_value_transaction_rate_6m,float,Proportion of high-value transactions in 6 months,Derived from income levels,0.14
+transactions_summary,online_transaction_ratio_6m,float,Proportion of online transactions,Determined by age and job category,0.74
+transactions_summary,total_transactions_12m,int,Total number of transactions in the last 12 months,Generated from Poisson distribution,360
+transactions_summary,total_transaction_amount_12m,float,Total transaction amount in the last 12 months,Calculated based on frequency and income,17600.75
+transactions_summary,average_transaction_amount_12m,float,Average transaction amount in the last 12 months,Calculated as total amount divided by transactions,48.89
+transactions_summary,transaction_frequency_12m,float,Transaction frequency per month in the last 12 months,Derived from total transactions,30.0
+transactions_summary,high_value_transaction_rate_12m,float,Proportion of high-value transactions in 12 months,Derived from income levels,0.13
+transactions_summary,online_transaction_ratio_12m,float,Proportion of online transactions,Determined by age and job category,0.72
+churn,churn_id,int,Unique churn event identifier,Sequential ID assigned during churn detection,501
+churn,customer_id,int,Reference to the customer ID,Foreign key from customers table,1001
+churn,churn_status,string,Indicates if the customer has churned,Calculated based on transaction frequency and income,Yes
+churn,churn_date,datetime,Date when the churn event occurred,Random date before reporting cutoff,2024-03-15
+digital_usage,customer_id,int,Reference to customer ID,Foreign key from customers table,1001
+digital_usage,has_mobile_app,string,Indicates mobile app usage,Assigned based on age distribution,Yes
+digital_usage,has_web_account,string,Indicates web account usage,Assumed most have it with high probability,Yes
+digital_usage,mobile_logins_per_week,int,Number of mobile app logins per week,Generated based on age and job,12
+digital_usage,web_logins_per_week,int,Number of web logins per week,Generated based on age and job,8
+digital_usage,avg_mobile_session_duration,float,Average mobile session duration in minutes,Generated based on age and income,5.0
+digital_usage,avg_web_session_duration,float,Average web session duration in minutes,Generated based on age,6.0
+digital_usage,last_mobile_login,datetime,Timestamp of the last mobile login,Generated based on churn and recency,2024-02-28 14:00:00
+digital_usage,last_web_login,datetime,Timestamp of the last web login,Generated based on churn and recency,2024-02-20 12:30:00
+campaigns,campaign_id,int,Unique identifier for the campaign,Sequential ID assigned,1
+campaigns,customer_segment,string,Target segment for the campaign,Assigned based on predefined mappings,Middle-Market
+campaigns,campaign_name,string,Name of the campaign,Generated dynamically based on target segment and product,Credit Card Campaign for Middle-Market
+campaigns,campaign_type,string,"Type of campaign (e.g., Email, SMS)",Assigned based on target segment preferences,Email
+campaigns,start_date,datetime,Date the campaign starts,Random date between Jan-Feb 2024,2024-01-15
+campaigns,end_date,datetime,Date the campaign ends,30-60 days after the start date,2024-03-15
+campaigns,target_audience,string,Description of the intended audience,Generated dynamically based on the target segment,Middle-Market customers interested in Credit Card solutions
+campaigns,offer_details,string,Details of the campaign offer,Generated dynamically based on the product,Special offer on our Credit Card tailored for Middle-Market customers.
+campaigns,conversion_rate,float,Conversion rate of the campaign,Simulated based on customer engagement,0.045
+customer_engagement,engagement_id,int,Unique ID for the engagement event,Sequential ID assigned,1
+customer_engagement,customer_id,int,Customer involved in engagement,Foreign key from customers table,1001
+customer_engagement,campaign_id,int,Linked campaign for the engagement,Foreign key from campaigns table,1
+customer_engagement,channel,string,Channel used for engagement,Derived from campaign type,Email
+customer_engagement,Sent Count,int,Number of messages sent during engagement,Simulated based on channel,1000
+customer_engagement,Delivered Count,int,Number of messages delivered successfully,Simulated based on sent count and delivery rate,950
+customer_engagement,Open Rate (%),float,Percentage of opened messages,Simulated based on segment matching,45.0
+customer_engagement,Click-Through Rate (CTR) (%),float,Percentage of clicks on engagement content,Simulated based on customer behavior,12.5
+customer_engagement,engagement_date,datetime,Date of the engagement event,Random date within campaign timeframe,2024-02-10
+customer_engagement,conversion_status,string,Whether the engagement resulted in a conversion,Simulated based on probability,Yes
