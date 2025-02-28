@@ -1,4 +1,4 @@
-table_name,column_name,data_type,data_explaination,data_assumption\
+table_name,column_name,data_type,data_explaination,data_assumption,\
 customers,customer_id,INTEGER,Unique identifier for each customer,Sequentially generated from 1 to n_customers,\
 customers,age,INTEGER,Customer\'92s age, Generated based on job type with anomalies injected for unrealistic values,\
 customers,job,STRING,Customer\'92s occupation category, Randomly chosen from a fixed list with defined probabilities,\
