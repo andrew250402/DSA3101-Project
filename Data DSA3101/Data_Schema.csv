@@ -8,6 +8,7 @@ customers,credit_default,STRING,Indicates if the customer has defaulted on credi
 customers,customer_segment,STRING,Segment assigned to customer based on demographics and behavior, Determined via a rule-based function using age; job; education and region
 customers,region,STRING,Geographic region (Urban/Suburban/Rural) of the customer, Randomly assigned using given probabilities
 customers,income,INTEGER,Monthly income in USD, Drawn from job-specific income ranges with occasional negative or high anomaly values
+customers,created_at,DATETIME,Date customer joined the bank, Skewed towards recent dates
 customers,credit_card,STRING,Indicator if the customer owns a credit card, Simulated based on job; age; income and customer segment with noise injection
 customers,personal_loan,STRING,Indicator if the customer owns a personal loan, Simulated using income; education; age and segment probabilities
 customers,mortgage,STRING,Indicator if the customer has a mortgage, Probability based on age; marital status; income; region and occasional anomaly injection
