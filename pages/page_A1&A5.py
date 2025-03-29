@@ -1,81 +1,193 @@
 import streamlit as st
 from streamlit_utilities import read_csv, read_image, read_model
 import numpy as np
+import pandas as pd
 
+st.set_page_config(layout="wide")
 st.title("page_A1&A5")
+st.title("1.1 Customer Segmentation")
+st.write("### Picking the right clustering algorithm")
+col1, col2 = st.columns(2)
+with col1:
+    st.header("Customer Segmentation for Existing Customers")
+    st.image(read_image("H clustering for existing customers.png"))
+    st.subheader("Hierarchical Clustering")
+    st.image(read_image("K Means clustering for existing customers.png"))
+    st.subheader("K Means Clustering")
+with col2:
+    st.header("Customer Segmentation for Incoming Customers")
+    st.image(read_image("H clustering for new customers.png"))
+    st.subheader("Hierarchical Clustering")
+    st.image(read_image("K Means clustering for new customers.png"))
+    st.subheader("K Means Clustering")
+pad1, mark, pad2 = st.columns([1, 2, 1])
+st.empty()
+st.markdown("#### Both K-Means and hierarchical clustering are able to segments the clusters well. But hierarchical edges over k-means due to slightly clearer segmentation and its slight robustness to outliers as compared to K-means. "
+"Additionally, hierarchical clustering can handle mixed data types better, and has no assumption on equal sized clusters (KMeans have the tendancy to create equally sized clusters).")
+st.empty()
+st.markdown("#### As such, hierarchical clustering will be chosen to segment existing customers.")
+st.empty()
+st.title("1.2 Real-time and Scalable Segmentation")
+st.empty()
+st.markdown(
+    """
+    ## 🔍 Understanding Hierarchical Clustering(HC)
+    #### HC builds a tree-like structure (dendrogram) to group data.
+    ### However, it struggles with **large datasets** due to:
+    #### - 🛑 High memory usage (storing distance matrices)
+    #### - 🛑 Slow computation (O(n²) complexity)
 
+    #### **Solution:** We use **BIRCH (Balanced Iterative Reducing and Clustering using Hierarchies)** and **Incremental PCA** to make HC scalable! 🚀
+    """
+)
+padding, col1, padding2 = st.columns([1, 2, 1])
+with padding:
+    st.empty()
+with col1:
+    st.header("Dendrogram")
+    st.image(read_image("dendrogram plot for existing customer.png"))
+with padding2:
+    st.empty()
 
+import streamlit as st
 
-st.title("Reading CSV file")
-try:
-    df = read_csv('customer_engagement.csv')
-    st.write("DataFrame from customer_engagement.csv:")
-    st.dataframe(df)
-except FileNotFoundError as e:
-    st.error(str(e))
+import streamlit as st
 
-st.title("Display png image")
-try:
-    image = read_image('apple.png')
-    st.write("Image from apple.png:")
-    st.image(image)
-except FileNotFoundError as e:
-    st.error(str(e))
+st.markdown("""
+<style>
+div[data-testid="stMarkdownContainer"] p, 
+div[data-testid="stMarkdownContainer"] li, 
+div[data-testid="stMarkdownContainer"] ul {
+    font-size: 18pt !important;
+    line-height: 1.5 !important;
+    margin-bottom: 12px !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
+st.markdown("### ⚡ How BIRCH (CF Trees) and Incremental PCA Accelerate Hierarchical Clustering")
 
+# Create columns with visible divider
+col1, divider, col2 = st.columns([5, 1, 5], gap="small")
 
-# read the saved model (.pkl file)
-model = read_model('logistic_regression_model.pkl')
+with col1:
+    st.markdown("""
+    #### **CF Trees (BIRCH)**
+    🏗️ **Balanced Iterative Reducing and Clustering using Hierarchies**  
+    - **Tree structure** that stores data summaries (Clustering Features) instead of raw points  
+    - Each CF contains:  
+      ✓ `N` (point count)  
+      ✓ `LS` (linear sum)  
+      ✓ `SS` (squared sum)  
+    - **Benefits for HC**:  
+      ▸ 90%+ memory reduction via compression  
+      ▸ Avoids O(n²) distance matrix calculations  
+      ▸ Enables streaming data support  
 
-st.title("Dummmy Logistic Regression Model Predictor")
-st.write("""
-Adjust the sliders to set feature values and see the model's prediction in real-time.
-The model was trained on randomly generated data with 5 features.
-""")
+    #### **Incremental PCA**  
+    📉 **Dimensionality Reduction for Scalable HC**  
+    - Processes data in **mini-batches** (unlike standard PCA)  
+    - **Key advantages**:  
+      ✓ Reduces "curse of dimensionality" in HC  
+      ✓ Removes noise/irrelevant features  
+      ✓ Updates model with new data (online learning)  
+      ✓ Preserves 95%+ variance with fewer dimensions  
+    """)
 
-# Create sliders for each feature in the sidebar
-st.sidebar.header("Feature Controls")
-sliders = []
-for i in range(5):
-    # Using normal distribution range (-3 to 3) since data was randomly generated
-    slider = st.sidebar.slider(
-        label=f"Feature {i + 1}",
-        min_value=-3.0,
-        max_value=3.0,
-        value=0.0,
-        step=0.1,
-        key=f"feature_{i}"
-    )
-    sliders.append(slider)
+with divider:
+    # Vertical divider line
+    st.markdown("""
+    <div style='border-left: 2px solid white; height: 800px; margin: 0 auto;'></div>
+    """, unsafe_allow_html=True)
 
-# Convert slider values to numpy array for prediction
-input_data = np.array(sliders).reshape(1, -1)
+with col2:
+    st.markdown("""
+    #### **Synergistic Effects**  
+    🔄 **Combined workflow**:  
+    1. IPCA first reduces dimensions  
+    2. BIRCH then clusters the compressed data  
+    3. Traditional HC merges the final subclusters  
+    
+    **Key Advantages**:  
+    ▸ 10-100x faster execution  
+    ▸ Processes >1M data points  
+    ▸ Real-time streaming capability  
+    ▸ Lower memory requirements  
+    </div>
+    """, unsafe_allow_html=True)
 
-# Make prediction
-prediction = model.predict(input_data)[0]
-probabilities = model.predict_proba(input_data)[0]
+# Horizontal divider at bottom
+st.divider()
 
-# Display results
-st.subheader("Prediction Results")
+st.subheader("⚡ Benefits of BIRCH and Incremental PCA")
 
-# Show prediction with color (red for class 0, green for class 1)
-if prediction == 1:
-    st.success(f"Predicted Class: {prediction} (Positive)")
-else:
-    st.error(f"Predicted Class: {prediction} (Negative)")
+data = {
+    "Feature": [
+        "Scalability (Large Datasets)",
+        "Memory Efficiency",
+        "Computational Speed",
+        "Streaming/Online Learning",
+        "Impact on HC"
+    ],
+    "BIRCH 🏗️ (Balanced Iterative Reducing and Clustering using Hierarchies)": [
+        "✅ <strong>Highly scalable</strong> (uses CF Trees for compression)",
+        "✅ <strong>Dramatically reduces memory</strong> by summarizing data into subclusters",
+        "✅ <strong>Faster than traditional HC</strong> (avoids pairwise distance matrices)",
+        "✅ <strong>Incremental clustering</strong> (adapts to new data points efficiently)",
+        "✅ <strong>Optimizes HC</strong> via CF Tree structure + threshold-based merging"
+    ],
+    "Incremental PCA 📉 (Principal Component Analysis)": [
+        "✅ <strong>Handles large datasets</strong> via batch processing",
+        "✅ <strong>Low-memory usage</strong> (processes data in mini-batches)",
+        "✅ <strong>Accelerates HC</strong> by reducing dimensionality first",
+        "✅ <strong>Supports online updates</strong> (model adjusts to new data)",
+        "✅ <strong>Improves HC efficiency</strong> by removing noise/redundant features"
+    ]
+}
 
-# Show probability bar chart
-st.write("Class Probabilities:")
-st.bar_chart({
-    "Class 0": probabilities[0],
-    "Class 1": probabilities[1]
-})
+df = pd.DataFrame(data)
 
-# Show raw probabilities
-st.write(f"Probability of Class 0: {probabilities[0]:.4f}")
-st.write(f"Probability of Class 1: {probabilities[1]:.4f}")
+# Generate HTML with Pandas Styler
+html = df.style.set_properties(**{
+    'font-size': '18pt',
+    'padding': '12px',
+    'color': '#ffffff',  # White text
+    'background-color': 'transparent'  # Transparent background
+}).to_html(escape=False)
 
-# Show the input values
-st.subheader("Current Input Values")
-for i, value in enumerate(sliders):
-    st.write(f"Feature {i + 1}: {value:.2f}")
+# Dark theme CSS
+html = f"""
+<style>
+    table {{
+        font-family: Arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+        color: #ffffff !important;
+        background-color: transparent !important;
+    }}
+    table th {{
+        font-weight: bold !important;
+        background-color: #333333 !important;
+        text-align: left;
+        padding: 12px;
+        border: 1px solid #444444 !important;
+    }}
+    table td {{
+        padding: 12px;
+        border-bottom: 1px solid #444444 !important;
+        background-color: #222222 !important;
+    }}
+    table tr:hover td {{
+        background-color: #2a2a2a !important;
+    }}
+    .dataframe {{
+        background-color: transparent !important;
+    }}
+    strong {{
+        color: #4fc3f7 !important;  # Light blue for bold text
+    }}
+</style>
+{html}
+"""
+
+st.markdown(html, unsafe_allow_html=True)
