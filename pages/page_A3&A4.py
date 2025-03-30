@@ -1,81 +1,77 @@
 import streamlit as st
 from streamlit_utilities import read_csv, read_image, read_model
-import numpy as np
+import pandas as pd
 
-st.title("page_A3&A4")
+# Load data
+customer_engagement_df = read_csv('customer_engagement.csv')
+customer_df = read_csv('customers.csv')
 
+# Set page config
+st.set_page_config(page_title="Marketing Campaign Analysis", layout="wide")
 
+# Create sidebar for page navigation
+st.sidebar.title("Navigation")
 
-st.title("Reading CSV file")
-try:
-    df = read_csv('customer_engagement.csv')
-    st.write("DataFrame from customer_engagement.csv:")
-    st.dataframe(df)
-except FileNotFoundError as e:
-    st.error(str(e))
+# Define pages
+pages = ["A3", "A4"]
 
-st.title("Display png image")
-try:
-    image = read_image('apple.png')
-    st.write("Image from apple.png:")
-    st.image(image)
-except FileNotFoundError as e:
-    st.error(str(e))
+# Radio buttons for page selection
+selected_page = st.sidebar.radio("Go to", pages)
 
 
+# Campaign Analysis Page
+if selected_page == "A3":
+    st.title("How do customer behaviors vary across different segments?")
 
-# read the saved model (.pkl file)
-model = read_model('logistic_regression_model.pkl')
+    st.subheader("Mean Product Usage across Customer Segments")
+    st.write("[Insert Chart Here]")
+    st.write("""
+             ### Insights:
+- **Cluster 0**: Low usage of investment products and credit cards.
+- **Cluster 1**: High usage of most products except personal loans.
+- **Cluster 2**: Low usage of investment products.
 
-st.title("Dummmy Logistic Regression Model Predictor")
-st.write("""
-Adjust the sliders to set feature values and see the model's prediction in real-time.
-The model was trained on randomly generated data with 5 features.
-""")
+### Recommendations:
+- **Cluster 0**: Increase promotions for investment products and credit cards.
+- **Cluster 1**: Offer personal loans with lower interest rates to boost adoption.
+- **Cluster 2**: Promote investment products to drive higher usage.
 
-# Create sliders for each feature in the sidebar
-st.sidebar.header("Feature Controls")
-sliders = []
-for i in range(5):
-    # Using normal distribution range (-3 to 3) since data was randomly generated
-    slider = st.sidebar.slider(
-        label=f"Feature {i + 1}",
-        min_value=-3.0,
-        max_value=3.0,
-        value=0.0,
-        step=0.1,
-        key=f"feature_{i}"
-    )
-    sliders.append(slider)
+### Overall Strategy:
+- Focus on personalized, targeted promotions for each cluster to increase product adoption and maximize marketing ROI.
+    """)
 
-# Convert slider values to numpy array for prediction
-input_data = np.array(sliders).reshape(1, -1)
+    st.subheader("Peak Month Spending and Frequency across Customer Segments")
+    st.write("[Insert Chart Here]")
+    st.write("""
+### Insights:
+- **Cluster 0**: Lowest peak month spending and frequency.
+- **Cluster 1**: Highest peak month spending and frequency.
+- **Cluster 2**: Moderate peak month spending frequency and amounts.
 
-# Make prediction
-prediction = model.predict(input_data)[0]
-probabilities = model.predict_proba(input_data)[0]
+### Recommendations:
+- **Cluster 0**: Offer re-engagement campaigns like cashback and discounts to increase spending frequency.
+- **Cluster 1**: Provide exclusive perks (e.g., priority customer service) and incentives (e.g., travel miles) to maintain high spending and encourage loyalty.
+- **Cluster 2**: Encourage higher spending by offering discounts or incentives for reaching specific spending thresholds.
 
-# Display results
-st.subheader("Prediction Results")
+### Overall Strategy:
+- Tailor promotions and incentives based on cluster spending habits to maximize engagement and increase overall spending.
 
-# Show prediction with color (red for class 0, green for class 1)
-if prediction == 1:
-    st.success(f"Predicted Class: {prediction} (Positive)")
-else:
-    st.error(f"Predicted Class: {prediction} (Negative)")
+    """)
 
-# Show probability bar chart
-st.write("Class Probabilities:")
-st.bar_chart({
-    "Class 0": probabilities[0],
-    "Class 1": probabilities[1]
-})
+    st.subheader("Mobile and Web Logins across Customer Segments")
+    st.write("Insert Chart Here")
+    st.write("""
+### Insights:
+- **All Clusters**: Higher average logins per week on mobile compared to web.
 
-# Show raw probabilities
-st.write(f"Probability of Class 0: {probabilities[0]:.4f}")
-st.write(f"Probability of Class 1: {probabilities[1]:.4f}")
+### Recommendations:
+- Invest more resources into improving the mobile app to enhance customer experience.
+- Push personalized recommendations based on customer usage patterns within the app.
 
-# Show the input values
-st.subheader("Current Input Values")
-for i, value in enumerate(sliders):
-    st.write(f"Feature {i + 1}: {value:.2f}")
+### Overall Strategy:
+- Focus on optimizing the mobile experience to increase engagement and deliver targeted, personalized offers.
+
+    """)
+
+elif selected_page == "A4":
+    st.title("What are the key performance indicators (KPIs) for assessing the success of marketing campaigns?")
