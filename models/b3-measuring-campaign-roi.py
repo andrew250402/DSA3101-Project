@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import os
 import pickle
-from pathlib import Path
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingClassifier
@@ -97,16 +96,16 @@ def load_and_preprocess_data():
 def selected_features():
     # features (column names) for easier accessibility. features were selected based on feature importances
     features = ['total_campaign_cost',
-                         'campaign_duration',
-                         'conversion_rate',
-                         'acquisition_cost',
-                         'customer_segment_Retired',
-                         'customer_segment_Young Professionals',
-                         'product_Credit Card',
-                         'product_Personal Loan',
-                         'campaign_type_Email',
-                         'campaign_type_Mobile App Notifications',
-                         'campaign_type_SMS']
+                'campaign_duration',
+                'conversion_rate',
+                'acquisition_cost',
+                'customer_segment_Retired',
+                'customer_segment_Young Professionals',
+                'product_Credit Card',
+                'product_Personal Loan',
+                'campaign_type_Email',
+                'campaign_type_Mobile App Notifications',
+                'campaign_type_SMS']
     return features
     
 def train_model():
