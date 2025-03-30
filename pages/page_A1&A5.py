@@ -10,15 +10,15 @@ st.write("### Picking the right clustering algorithm")
 col1, col2 = st.columns(2)
 with col1:
     st.header("Customer Segmentation for Existing Customers")
-    st.image(read_image("H clustering for existing customers.png"))
+    st.image(read_image("A1_H_existing_cluster.png"))
     st.subheader("Hierarchical Clustering")
-    st.image(read_image("K Means clustering for existing customers.png"))
+    st.image(read_image("A1_K_exisiting_cluster.png"))
     st.subheader("K Means Clustering")
 with col2:
     st.header("Customer Segmentation for Incoming Customers")
-    st.image(read_image("H clustering for new customers.png"))
+    st.image(read_image("A1_H_new_cluster.png"))
     st.subheader("Hierarchical Clustering")
-    st.image(read_image("K Means clustering for new customers.png"))
+    st.image(read_image("A1_K_new_cluster.png"))
     st.subheader("K Means Clustering")
 pad1, mark, pad2 = st.columns([1, 2, 1])
 st.empty()
@@ -45,7 +45,7 @@ with padding:
     st.empty()
 with col1:
     st.header("Dendrogram")
-    st.image(read_image("dendrogram plot for existing customer.png"))
+    st.image(read_image("A5_dendrogram.png"))
 with padding2:
     st.empty()
 
