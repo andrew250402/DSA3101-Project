@@ -3,6 +3,9 @@ from streamlit_utilities import read_csv, read_image, read_model
 import numpy as np
 import pandas as pd
 
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 st.title("Personalisation with Cost-Effectiveness in Marketing Campaigns")
 
 
