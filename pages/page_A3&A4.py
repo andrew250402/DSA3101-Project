@@ -11,6 +11,8 @@ product_usage = read_image("A3_mean_product_usage.png")
 spending_behaviour = read_image("A3_spending_behaviour.png")
 mobile_web_logins = read_image("A3_mobile_web_logins.png")
 profit_clv_per_product = read_image("A4_profit_clv_per_product.jpg")
+heatmap_campaigns_kpis = read_image("A4_heatmap_campaigns_kpis.png")
+correlation_matrix_kpis = read_image("A4_correlation_matrix_kpis.png")
 
 # Set page config
 st.set_page_config(page_title="Marketing Campaign Analysis", layout="wide")
@@ -133,7 +135,7 @@ To evaluate campaign performance, we identified and developed key performance in
 
              """)
     st.subheader("Heatmap Analysis")
-    st.write("[Insert Photo Here]")
+    st.image(heatmap_campaigns_kpis)
     st.write("""
 ### Insights:  
 - **Delivery Issues**:  
@@ -164,6 +166,7 @@ To evaluate campaign performance, we identified and developed key performance in
     """)
 
     st.subheader("Correlation Matrix Analysis")
+    st.image(correlation_matrix_kpis)
     st.write("""
 ### Insights:  
 - **Engagement Score & Conversion/Profitability**:  
