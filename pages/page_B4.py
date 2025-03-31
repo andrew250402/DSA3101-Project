@@ -3,16 +3,57 @@ from streamlit_utilities import read_csv, read_image, read_model
 import numpy as np
 import pandas as pd
 
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 st.title("Personalisation with Cost-Effectiveness in Marketing Campaigns")
 
 
 
 st.title("Campaigns Dataset")
 try:
-    df = read_csv('campaigns.csv')
-    st.dataframe(df)
+    campaigns = read_csv('campaigns.csv')
+    st.dataframe(campaigns)
 except FileNotFoundError as e:
     st.error(str(e))
+#Get ROI
+campaigns["ROI"] = (campaigns["total_revenue_generated"] - campaigns["total_campaign_cost"]) / campaigns["total_campaign_cost"]
+# Define multipliers for campaign type and customer segment
+campaigns_type_mult = {
+    "Mobile App Notifications": 1.3,
+    "Email": 1.2,
+    "SMS": 1.1,
+    "Direct Mail": 1.0
+}
+
+campaigns_seg_mult = {
+    "High-Value": 1.4,
+    "Young Professionals": 1.3,
+    "Middle-Market": 1.2,
+    "Retired": 1.1,
+    "Budget-Conscious": 1.0
+}
+
+product_mult = {
+    "Personal Loan": 1.3,
+    "Wealth Management": 1.5,
+    "Credit Card": 1.2,
+    "Savings Account": 1.0,
+    "Auto Loan": 1.1,
+    "Mortgage": 1.4,
+    "Investment Product": 1.3
+}
+
+# Apply the multipliers using .map()
+campaigns["type_mult"] = campaigns["campaign_type"].map(campaigns_type_mult)
+campaigns["seg_mult"] = campaigns["customer_segment"].map(campaigns_seg_mult)
+campaigns["product_pers_score"] = campaigns["recommended_product_name"].map(product_mult)
+
+# Compute personalization score
+campaigns["pers_score"] = campaigns["type_mult"] * campaigns["seg_mult"] * campaigns["product_pers_score"]
+# Display the updated DataFrame
+print(campaigns[["campaign_id", "campaign_type", "customer_segment", "pers_score"]].head())
+
 
 st.title("Personalisation Score Multipliers and Rationales")
 
@@ -69,68 +110,121 @@ recommended_product_table = recommended_product_table.style.set_table_styles([
 ])
 st.dataframe(recommended_product_table)
 
-st.title("Display png image")
-try:
-    image = read_image('apple.png')
-    st.write("Image from apple.png:")
-    st.image(image)
-except FileNotFoundError as e:
-    st.error(str(e))
+# Create correlation tables for different categories
+correlation_campaign_type = campaigns.groupby('campaign_type').apply(lambda group: group['ROI'].corr(group['pers_score']), include_groups=False).reset_index()
+correlation_campaign_type.columns = ['Campaign Type', 'Correlation (ROI vs. Pers. Score)']
 
+correlation_customer_segment = campaigns.groupby('customer_segment').apply(lambda group: group['ROI'].corr(group['pers_score']), include_groups=False).reset_index()
+correlation_customer_segment.columns = ['Customer Segment', 'Correlation (ROI vs. Pers. Score)']
 
+correlation_recommended_product = campaigns.groupby('recommended_product_name').apply(lambda group: group['ROI'].corr(group['pers_score']), include_groups=False).reset_index()
+correlation_recommended_product.columns = ['Recommended Product', 'Correlation (ROI vs. Pers. Score)']
 
-# read the saved model (.pkl file)
-model = read_model('logistic_regression_model.pkl')
+# Function to return the action and strategy based on correlation
+def get_action_strategy(correlation_value):
+    if 0.7 <= correlation_value <= 1:
+        return "High Personalization Focus", "Double down on personalization efforts (e.g., high personalization emails, notifications)"
+    elif 0.3 <= correlation_value < 0.7:
+        return "Moderate Personalization", "Continue with personalized efforts, test different strategies"
+    elif 0 <= correlation_value < 0.3:
+        return "Minimal Personalization", "Focus on light personalization or segment-based targeting"
+    elif 0 <= correlation_value < -0.3:
+        return "Cost-Effective or Generic", "Use broad targeting with minimal personalization"
+    elif -1 <= correlation_value < 0:
+        return "Avoid Excessive Personalization", "Use mass-market campaigns, avoid deep personalization"
+    else:
+        return None, None  # In case of invalid correlation values
 
-st.title("Dummmy Logistic Regression Model Predictor")
-st.write("""
-Adjust the sliders to set feature values and see the model's prediction in real-time.
-The model was trained on randomly generated data with 5 features.
-""")
+# Streamlit UI
+st.title("ROI vs. Personalization Score Analysis")
 
-# Create sliders for each feature in the sidebar
-st.sidebar.header("Feature Controls")
-sliders = []
-for i in range(5):
-    # Using normal distribution range (-3 to 3) since data was randomly generated
-    slider = st.sidebar.slider(
-        label=f"Feature {i + 1}",
-        min_value=-3.0,
-        max_value=3.0,
-        value=0.0,
-        step=0.1,
-        key=f"feature_{i}"
-    )
-    sliders.append(slider)
+# Radio button for plot selection
+plot_choice = st.radio(
+    "Select a plot:",
+    ["Campaign Type", "Customer Segment", "Recommended Product"]
+)
 
-# Convert slider values to numpy array for prediction
-input_data = np.array(sliders).reshape(1, -1)
+# Select category (simulate hover behavior)
+if plot_choice == "Campaign Type":
+    category = st.selectbox("Select Campaign Type:", ["All"] + list(campaigns['campaign_type'].unique()))
+    if category == "All":
+        filtered_data = campaigns
+    else:
+        filtered_data = campaigns[campaigns['campaign_type'] == category]
+    
+    # Display Plot
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.scatterplot(data=filtered_data, x="pers_score", y="ROI", hue="campaign_type", alpha=0.7, ax=ax)
+    ax.set_title(f"ROI vs. Personalization Score (Campaign Type: {category})")
+    ax.legend(title="Campaign Type", bbox_to_anchor=(1.05, 1), loc='upper left')
+    st.pyplot(fig)
+    
+    # Display Correlation Table for selected category
+    if category == "All":
+        st.write(correlation_campaign_type)
+    else:
+        st.write(correlation_campaign_type[correlation_campaign_type['Campaign Type'] == category])
 
-# Make prediction
-prediction = model.predict(input_data)[0]
-probabilities = model.predict_proba(input_data)[0]
+    # Display Action and Strategy for selected category (if not "All")
+    if category != "All":
+        correlation_value = correlation_campaign_type[correlation_campaign_type['Campaign Type'] == category]['Correlation (ROI vs. Pers. Score)'].values[0]
+        action, strategy = get_action_strategy(correlation_value)
+        st.write(f"**Correlation Coefficient:** {correlation_value:.2f}")
+        st.write(f"**Action to Take:** {action}")
+        st.write(f"**Strategy:** {strategy}")
 
-# Display results
-st.subheader("Prediction Results")
+elif plot_choice == "Customer Segment":
+    category = st.selectbox("Select Customer Segment:", ["All"] + list(campaigns['customer_segment'].unique()))
+    if category == "All":
+        filtered_data = campaigns
+    else:
+        filtered_data = campaigns[campaigns['customer_segment'] == category]
+    
+    # Display Plot
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.scatterplot(data=filtered_data, x="pers_score", y="ROI", hue="customer_segment", alpha=0.7, ax=ax)
+    ax.set_title(f"ROI vs. Personalization Score (Customer Segment: {category})")
+    ax.legend(title="Customer Segment", bbox_to_anchor=(1.05, 1), loc='upper left')
+    st.pyplot(fig)
+    
+    # Display Correlation Table for selected category
+    if category == "All":
+        st.write(correlation_customer_segment)
+    else:
+        st.write(correlation_customer_segment[correlation_customer_segment['Customer Segment'] == category])
 
-# Show prediction with color (red for class 0, green for class 1)
-if prediction == 1:
-    st.success(f"Predicted Class: {prediction} (Positive)")
-else:
-    st.error(f"Predicted Class: {prediction} (Negative)")
+    # Display Action and Strategy for selected category (if not "All")
+    if category != "All":
+        correlation_value = correlation_customer_segment[correlation_customer_segment['Customer Segment'] == category]['Correlation (ROI vs. Pers. Score)'].values[0]
+        action, strategy = get_action_strategy(correlation_value)
+        st.write(f"**Correlation Coefficient:** {correlation_value:.2f}")
+        st.write(f"**Action to Take:** {action}")
+        st.write(f"**Strategy:** {strategy}")
 
-# Show probability bar chart
-st.write("Class Probabilities:")
-st.bar_chart({
-    "Class 0": probabilities[0],
-    "Class 1": probabilities[1]
-})
+elif plot_choice == "Recommended Product":
+    category = st.selectbox("Select Recommended Product:", ["All"] + list(campaigns['recommended_product_name'].unique()))
+    if category == "All":
+        filtered_data = campaigns
+    else:
+        filtered_data = campaigns[campaigns['recommended_product_name'] == category]
+    
+    # Display Plot
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.scatterplot(data=filtered_data, x="pers_score", y="ROI", hue="recommended_product_name", alpha=0.7, ax=ax)
+    ax.set_title(f"ROI vs. Personalization Score (Recommended Product: {category})")
+    ax.legend(title="Recommended Product", bbox_to_anchor=(1.05, 1), loc='upper left')
+    st.pyplot(fig)
+    
+    # Display Correlation Table for selected category
+    if category == "All":
+        st.write(correlation_recommended_product)
+    else:
+        st.write(correlation_recommended_product[correlation_recommended_product['Recommended Product'] == category])
 
-# Show raw probabilities
-st.write(f"Probability of Class 0: {probabilities[0]:.4f}")
-st.write(f"Probability of Class 1: {probabilities[1]:.4f}")
-
-# Show the input values
-st.subheader("Current Input Values")
-for i, value in enumerate(sliders):
-    st.write(f"Feature {i + 1}: {value:.2f}")
+    # Display Action and Strategy for selected category (if not "All")
+    if category != "All":
+        correlation_value = correlation_recommended_product[correlation_recommended_product['Recommended Product'] == category]['Correlation (ROI vs. Pers. Score)'].values[0]
+        action, strategy = get_action_strategy(correlation_value)
+        st.write(f"**Correlation Coefficient:** {correlation_value:.2f}")
+        st.write(f"**Action to Take:** {action}")
+        st.write(f"**Strategy:** {strategy}")
