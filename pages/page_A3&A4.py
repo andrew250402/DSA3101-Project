@@ -100,78 +100,86 @@ Focus on optimizing the mobile experience to increase engagement and deliver tar
 
 elif selected_page == "A4: Campaign Impact":
     st.title("What are the key performance indicators (KPIs) for assessing the success of marketing campaigns?")
-    st.markdown("""
-### Overview
-To evaluate campaign performance, we developed metrics such as engagement score, conversion
-rate, total profit and customer lifetime value (CLV) from each campaign. We then used
-clustering and correlation matrix to identify patterns.
-""")
-
     st.write("""
 ### Campaign Performance Evaluation  
 
-To evaluate campaign performance, we identified and developed key performance indicators (KPIs) such as **engagement score, conversion rate, and customer lifetime value (CLV)**. We also calculated the **total profit** for each campaign.  
+To evaluate campaign performance, we identified and developed key performance indicators (KPIs) such as **Engagement Score, Conversion Rate, and Customer Lifetime Value (CLV)**. We also calculated the **Total Profit** for each campaign.  
 
 #### Key Metrics:  
+
+Before we move on to discuss about our insights regarding campaign success indicators, let's first examine the key metrics that enabled our analysis:
 
 - **Conversion Rate**: Percentage of customers who converted after the campaign.  
 - **Engagement Score**: Aggregated score based on user interaction with the campaign.  
   - Derived from **open rate, click rate, and average engagement time**, normalized to a value between 0 and 1.  
   - **Formula**:  
-    ```
-    Engagement Score = 0.3 * Open Rate + 0.5 * Click Rate + 0.2 * Scaled Engagement Time
-    ```
+""")
+    st.latex(r"Engagement Score = 0.3 \times Open\ Rate + 0.5 \times Click\ Rate + 0.2 \times Scaled\ Engagement\ Time")
+    st.write("""
 - **Customer Lifetime Value (CLV)**:  
   - For customers who converted, CLV was calculated as:  
-    ```
-    CLV = Monthly Revenue * (1 / Churn Probability)
-    ```
-  - The **average CLV** was then determined for each campaign.  
+""")
+    st.latex(r"\text{CLV} = \text{Monthly Revenue} \times \frac{1}{\text{Churn Probability}}")
+    st.write("""
+  - The **average CLV** of the targeted customerswas then determined for each campaign.  
 - **Total Profit**:  
   - Calculated as:  
-    ```
-    Total Profit = Total Revenue - Total Campaign Cost
-    ```
+""")
+    st.latex(r"\text{Total Profit} = \text{Total Revenue} - \text{Total Campaign Cost}")
 
-             """)
     st.subheader("Heatmap Analysis")
+    st.write("""
+A Campaign Engagement Heatmap was generated to allow us to visually analyse how users interacted with campaigns.
+Color gradients are used to highlight areas performed in metrics such as `click_rate`, `open_rate` and `conversion_rate`.
+Green is used for areas of high engagement, while Red indicates that the campaign is performing poorly in this metric.
+""")
     st.image(heatmap_campaigns_kpis)
     st.write("""
 ### Insights:  
 - **Delivery Issues**:  
-  - The **"Mortgage Campaign for Retired"** and **"Savings Account Campaign for Retired"** had particularly low delivery rates.  
-  - Campaigns targeting retired individuals need further investigation to understand delivery issues.  
-  - As a result, these campaigns also had low open rates.  
+  - The **"Mortgage Campaign for Retired"** and **"Savings Account Campaign for Retired"** campaigns had particularly low delivery rates.  
+  - Campaigns targeting retired individuals require further investigation to understand delivery issues.  
+  - As a result, these campaigns also had low click and open rates.  
 
 - **Overall Campaign Performance**:  
-  - Open, click, and conversion rates were generally low, even for well-delivered campaigns.  
-  - There is **room for improvement** in refining messaging and targeting tactics to enhance engagement and conversion.  
-             """)
+  - Open, click, and conversion rates are generally low across all campaigns, even the well-delivered ones.  
+  - This shows that there is **room for improvement** in refining messaging and targeting tactics to enhance campaign engagement and conversion rates.  
+""")
     
     st.subheader("CLV and Profit Analysis")
+    st.write("""
+In this section, we analyse the two key performance metrics: Total Profit and average CLV (per targeted customer), across different customer segments and recommended products.
+""")
+
     st.image(profit_clv_per_product)
     st.markdown("""
 ### Insights:  
 - **Total Profit Analysis**:  
-  - **Wealth management for the retired** had the highest total profit.  
-  - **Auto loan for young professionals** had the lowest total profit.  
+  - **Wealth Management for the Retired** attained the highest total profit.  
+  - **Auto Loan for Young Professionals** amassed the least total profit.  
 
 - **Average CLV Analysis**:  
-  - **Investment products for young professionals** had the highest CLV.  
-  - The **retired customer segment** consistently showed high CLV across multiple products.  
+  - **Investment Products for Young Professionals** had the highest CLV.  
+  - The **Retired** customer segment consistently showed high CLV across multiple products.  
 
 - **CLV vs. Profitability**:  
-  - The **retired segment** is a strong target group, showing both high profit and high CLV.  
-  - CLV does not always align with profitability—e.g., **auto loans for young professionals** had high CLV but low profit.  
+  - The **Retired** customer segment is a particularly strong target group, consistently performing well in Total Profit and average CLV across the different recommended products.
+  - Targeting a segment with  high CLV does not necessarily result in high profitability. For example, the **Auto Loans for Young Professionals** campaign targeted customers with high CLV but still resulted in low Total Profits.  
     """)
 
     st.subheader("Correlation Matrix Analysis")
+    st.write("""
+In this section, a Correlation Matrix is utilised to allow us to better understand the strength and direction of relationships between key metrics in our dataset. Values range from -1 to 1:
+- +1: indicates a perfect positive correlation between two variables
+- -1: indicates a perfect negative correlation
+- 0: the two variables are (likely) unrelated. No apparent relationship.
+""")
     st.image(correlation_matrix_kpis)
     st.write("""
 ### Insights:  
 - **Engagement Score & Conversion/Profitability**:  
   - Engagement score is **negatively correlated** with conversion rate and has **almost zero correlation** with total profit.  
-  - This suggests that the current engagement score definition does not reflect actual business outcomes.  
+  - This suggests that the current engagement score definition may not reflect tangible business outcomes.  
   - Resources may be misallocated toward **vanity metrics** (e.g., opens, clicks) that do not drive conversions or profits.  
 
 - **Conversion Rate & Profitability**:  
@@ -181,7 +189,7 @@ To evaluate campaign performance, we identified and developed key performance in
 
     st.subheader("Overall Recommendation")
     st.write("""
-### Key Strategic Recommendations:
+#### Key Strategic Recommendations:
 
 1. **Refocus Marketing and Resource Allocation**  
    - Shift focus away from **superficial engagement metrics** (e.g., opens, clicks) and instead prioritize **conversion-driven strategies**.  
@@ -194,11 +202,10 @@ To evaluate campaign performance, we identified and developed key performance in
    - **Redefine engagement metrics** to align with actual business outcomes rather than vanity metrics.  
 
 3. **Optimize Product Strategy**  
-   - **Prioritize marketing efforts** toward the **retired segment**, as they show both high CLV and profitability.  
-   - **Investigate auto loans for young professionals**, which have high CLV but low profitability, to improve financial returns.  
-   - **Balance profitability and long-term customer value** when designing product strategies and marketing campaigns.  
+   - **Prioritize marketing efforts** toward the **Retired** segment, as they show both high CLV and profitability.  
+   - **Investigate the Auto Loans for Young Professionals Campaign**, which scored high in CLV metrics but performed poorly in profitability, to improve financial returns.  
 
 4. **Drive Higher Conversions and Profitability**  
-   - **Shift resources** from vanity engagement metrics to tactics that **increase conversions and profits**.  
-   - **Target high CLV customer segments** with tailored offers to maximize lifetime value and business growth.  
+   - **Shift resources** from vanity engagement metrics to tactics that are proven to **increase conversions and profits**.  
+   - **Balance profitability and long-term customer value** when designing product strategies and marketing campaigns.  
     """)
