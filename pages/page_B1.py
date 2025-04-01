@@ -2,53 +2,44 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.multioutput import ClassifierChain
 from sklearn.metrics import classification_report, hamming_loss, make_scorer, f1_score
 from sklearn.model_selection import train_test_split, GridSearchCV
-from xgboost import XGBClassifier
+from sklearn.ensemble import RandomForestClassifier  # Using RandomForest instead of XGBoost
 import os
+from mlxtend.frequent_patterns import apriori
 
 # Configure the page
 st.set_page_config(page_title="Bank Product Recommendation", layout="wide")
 
-page = st.sidebar.selectbox("Select Page", ["Product Recommendation", "Model Performance", "Project Flow"])
+# Sidebar Page Navigation
+page = st.sidebar.selectbox("Select Page", ["Project Flow", "Model Performance", "Apriori Analysis","Product Recommendation"])
 
-if page == "Project Flow":
-    # (Paste the code from the new page here)
-    ...
-
-
-# Set paths (update as necessary)
+# Path Setup
 base_dir = os.path.dirname(os.path.abspath(__file__))
 csv_path = os.path.join(base_dir, "..", "Data DSA3101", "customer_data_with_labels_only.csv")
 
-# Function to load data, process it, and train the model
 @st.cache_data
 def load_and_train_model():
-    # Load dataset
     df = pd.read_csv(csv_path)
     if "customer_id" in df.columns:
         df.drop("customer_id", axis=1, inplace=True)
-    
-    # Define product columns and categorical columns
+
     product_cols = [
         "credit_card", "personal_loan", "mortgage", "savings_account",
         "investment_product", "auto_loan", "wealth_management"
     ]
     categorical_cols = ["job", "marital", "education", "cluster", "region"]
-    
+
     # One-hot encode categorical variables
     df = pd.get_dummies(df, columns=categorical_cols, drop_first=True)
-    
-    # Ensure product columns are boolean
     df[product_cols] = df[product_cols].astype(bool)
     
-    # Process time feature
+    # Calculate days since account creation and drop the original date column
     df["days_since_acc_created"] = (pd.Timestamp.now() - pd.to_datetime(df["created_at"])) / pd.Timedelta(days=1)
     df.drop("created_at", axis=1, inplace=True)
-    
-    # Create engineered features based on frequent bundles
+
+    # Create new features based on frequent product bundles
     frequent_bundles = [
         ['credit_card', 'personal_loan'],
         ['credit_card', 'savings_account'],
@@ -58,44 +49,41 @@ def load_and_train_model():
         ['auto_loan', 'credit_card', 'savings_account']
     ]
     for bundle in frequent_bundles:
-        feature_name = 'bundle_' + '_'.join(sorted(bundle))
-        df[feature_name] = df[bundle].all(axis=1)
+        name = 'bundle_' + '_'.join(sorted(bundle))
+        df[name] = df[bundle].all(axis=1)
     product_cols += ['bundle_' + '_'.join(sorted(b)) for b in frequent_bundles]
-    
-    # Separate features and labels
+
+    # Define feature columns and fill missing values
     feature_cols = [col for col in df.columns if col not in product_cols]
     df[feature_cols] = df[feature_cols].fillna(method="ffill")
     X = df[feature_cols]
     y = df[product_cols]
-    
-    # Split the data into training and test sets
+
+    # Split into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
-    # Build model using XGBoost as base estimator wrapped in a Classifier Chain
-    base_clf = XGBClassifier(use_label_encoder=False, eval_metric='mlogloss', random_state=42)
+
+    # Initialize RandomForest as base estimator
+    base_clf = RandomForestClassifier(random_state=42)
     chain = ClassifierChain(base_estimator=base_clf, random_state=42)
-    
-    # Define scoring and parameter grid
+
+    # Define a scorer and hyperparameter grid specific to RandomForest
     scorer = make_scorer(f1_score, average="macro")
     param_grid = {
-        'base_estimator__n_estimators': [50],
-        'base_estimator__max_depth': [5],
-        'base_estimator__learning_rate': [0.1],
-        'base_estimator__subsample': [0.9],
-        'base_estimator__colsample_bytree': [0.9]
+        'base_estimator__n_estimators': [50, 100],
+        'base_estimator__max_depth': [None, 5, 10],
+        'base_estimator__min_samples_split': [2, 5]
     }
-    
+
+    # Grid search with cross-validation
     grid = GridSearchCV(chain, param_grid=param_grid, scoring=scorer, cv=3, verbose=0, n_jobs=-1)
     grid.fit(X_train, y_train)
-    
+
     best_model = grid.best_estimator_
     y_pred = best_model.predict(X_test)
-    # For multi-label, predict_proba returns a list of arrays; here we simplify by extracting the probability of class 1
     y_prob = best_model.predict_proba(X_test)
-    
+
     return best_model, X, y, X_test, y_test, y_pred, y_prob, feature_cols, product_cols, grid
 
-# Load model and data once (cached)
 (best_model, X_all, y_all, X_test, y_test, y_pred, y_prob, feature_cols, product_cols, grid) = load_and_train_model()
 
 # ---------------------------
@@ -177,7 +165,6 @@ if page == "Product Recommendation":
         input_df = pd.DataFrame([input_dict])[feature_cols]
 
         # Predict probabilities for each product
-        # Assuming predict_proba returns a 2D array: shape (1, num_products)
         probs = best_model.predict_proba(input_df)  
         # Extract the single row of probabilities
         prob_vector = probs[0]
@@ -188,19 +175,16 @@ if page == "Product Recommendation":
             "Probability": prob_vector
         }).sort_values(by="Probability", ascending=False)
 
-        st.subheader("📊 All Product Probabilities (Sorted)")
-        st.dataframe(result_df)
+        # Split products into individual and bundle categories
+        result_individual = result_df[~result_df["Product"].str.startswith("bundle")].reset_index(drop=True)
+        result_bundle = result_df[result_df["Product"].str.startswith("bundle")].reset_index(drop=True)
 
-        # Optional: Display a horizontal bar chart for visualization
-        st.subheader("📈 Probability Distribution Chart")
-        fig, ax = plt.subplots()
-        ax.barh(result_df["Product"], result_df["Probability"])
-        ax.set_xlabel("Probability")
-        ax.set_title("Predicted Interest in Products")
-        ax.invert_yaxis()  # Highest probability at the top
-        st.pyplot(fig)
+        # Display two separate tables
+        st.subheader("Individual Products")
+        st.dataframe(result_individual)
 
-
+        st.subheader("Bundled Products")
+        st.dataframe(result_bundle)
 
 elif page == "Model Performance":
     st.title("📈 Model Training and Test Results")
@@ -208,20 +192,10 @@ elif page == "Model Performance":
     st.markdown("---")
     st.markdown(
         "This section displays the **training** and **test** performance of the model using **GridSearchCV** "
-        "and a **ClassifierChain** with an **XGBoost** base estimator. Below, you will find key performance metrics, "
+        "and a **ClassifierChain** with a **XGBoost** base estimator. Below, you will find key performance metrics, "
         "a detailed classification report, and a legend mapping product indices to individual products and bundles."
     )
     
-    # Summary Metrics: Parameters and Macro F1 Score
-    col1, col2 = st.columns(2)
-    with col1:
-        st.subheader("Best Grid Search Parameters")
-        st.json(grid.best_params_)
-    with col2:
-        st.subheader("Best Macro F1 Score")
-        st.metric(label="Macro F1 Score", value=f"{grid.best_score_:.3f}")
-    
-    st.markdown("---")
     
     # Detailed Classification Report in an Expander
     st.subheader("Classification Report on Test Set")
@@ -229,13 +203,6 @@ elif page == "Model Performance":
         report_dict = classification_report(y_test, y_pred, output_dict=True)
         report_df = pd.DataFrame(report_dict).transpose()
         st.dataframe(report_df)
-    
-    st.markdown("---")
-    
-    # Hamming Loss Metric
-    st.subheader("Final Hamming Loss on Test Set")
-    loss = hamming_loss(y_test, y_pred)
-    st.metric(label="Hamming Loss", value=f"{loss:.3f}")
     
     st.markdown("---")
     
@@ -259,10 +226,37 @@ elif page == "Model Performance":
     st.markdown(legend_text, unsafe_allow_html=True)
 
 
+elif page == "Apriori Analysis":
+    st.title("📊 Apriori Analysis Results")
+    
+    # Load the CSV file (reuse csv_path from earlier)
+    df_apriori = pd.read_csv(csv_path)
+    if "customer_id" in df_apriori.columns:
+        df_apriori.drop("customer_id", axis=1, inplace=True)
+    
+    # Define the product columns
+    product_cols_apriori = [
+        "credit_card", "personal_loan", "mortgage", "savings_account",
+        "investment_product", "auto_loan", "wealth_management"
+    ]
+    df_apriori[product_cols_apriori] = df_apriori[product_cols_apriori].astype(bool)
+    
+    # Compute frequent itemsets using mlxtend's apriori
+    from mlxtend.frequent_patterns import apriori, association_rules
+    frequent_itemsets = apriori(df_apriori[product_cols_apriori], min_support=0.05, use_colnames=True)
 
 
+    # Sort by support (descending order)
+    frequent_itemsets_sorted = frequent_itemsets.sort_values(by='support', ascending=False)
 
-if page == "Project Flow":
+    
+    # Display the frequent itemsets table
+    st.subheader("Frequent Itemsets (Sorted by Support)")
+    st.dataframe(frequent_itemsets_sorted)
+    
+
+
+elif page == "Project Flow":
     st.title("🔍 Project Flow: From Apriori to Machine Learning")
 
     st.markdown("### Overview")
@@ -271,34 +265,60 @@ if page == "Project Flow":
         "The flow below outlines the process from data collection to model deployment."
     )
 
-    # Flow Diagram using Graphviz
     flow_diagram = """
     digraph {
-        rankdir=LR;
-        node [shape=box, style=filled, color=lightblue];
-        DataCollection [label="Data Collection & Integration"];
-        Preprocessing [label="Data Preprocessing\n(One-hot Encoding, Time Features)"];
-        Apriori [label="Apriori Analysis\n(Frequent Itemsets)"];
-        FeatureEngineering [label="Feature Engineering\n(Bundle Features)"];
-        ModelTraining [label="Model Training\n(ClassifierChain, GridSearchCV)"];
-        Evaluation [label="Model Evaluation\n(Classification Report, Hamming Loss)"];
-        Prediction [label="Product Recommendation\n(Predict & Visualize)"];
+        // Layout: left-to-right
+        rankdir=UD;
+        node [shape=box, style=filled, color=lightgreen, fontsize=13];
+        nodesep=0.5;
+        ranksep=1.2;
 
-        DataCollection -> Preprocessing;
-        Preprocessing -> Apriori;
-        Apriori -> FeatureEngineering;
-        FeatureEngineering -> ModelTraining;
-        ModelTraining -> Evaluation;
-        Evaluation -> Prediction;
+        // --- TOP ROW NODES ---
+        DataCollection [label="Data Collection & Integration"];
+        Preprocessing [label="Data Preprocessing\\n(One-hot Encoding, Time Features)"];
+        Apriori [label="Apriori Analysis\\n(Frequent Itemsets)"];
+        FeatureEngineering [label="Feature Engineering\\n(Bundle Features)"];
+
+        // --- BOTTOM ROW NODES ---
+        // We insert an invisible blank node in the leftmost column to align columns properly
+        blank1 [label="", style=invis, width=0.1];
+        Prediction [label="Product Recommendation\\n(Predict & Visualize)"];
+        Evaluation [label="Model Evaluation\\n(Classification Report, Hamming Loss)"];
+        ModelTraining [label="Model Training\\n(ClassifierChain, GridSearchCV)"];
+
+        // Force each row's nodes to share the same rank
+        { rank = same; DataCollection; Preprocessing; Apriori; FeatureEngineering }
+        { rank = same; blank1; Prediction; Evaluation; ModelTraining }
+
+        // --- EDGES: TOP ROW (left → right) ---
+        DataCollection -> Preprocessing
+        Preprocessing -> Apriori
+        Apriori -> FeatureEngineering
+
+        // --- EDGES: DOWN from top row col4 to bottom row col4 ---
+        FeatureEngineering -> ModelTraining
+
+        // --- EDGES: BOTTOM ROW (right → left visually, but "ModelTraining -> Evaluation -> Prediction" in code) ---
+        ModelTraining -> Evaluation
+        Evaluation -> Prediction
+
+        // --- INVISIBLE EDGES to align columns ---
+        DataCollection -> blank1 [style=invis]
+        Preprocessing -> Prediction [style=invis]
+        Apriori -> Evaluation [style=invis]
     }
     """
+
+
+
+
     st.graphviz_chart(flow_diagram)
 
     st.markdown("### Detailed Process Description")
     st.markdown(
         """
     **1. Data Collection & Integration:**  
-    - **Collect** raw data from multiple sources including customer transactions and demographic information.
+    - **Collect** raw data such as customer details and their product ownership.
 
     **2. Data Preprocessing:**  
     - **Clean** and **transform** the raw data.  
@@ -312,11 +332,11 @@ if page == "Project Flow":
     - Create new binary features based on the frequent itemsets discovered, representing whether a customer holds a specific product bundle.
 
     **5. Model Training:**  
-    - Build a **multi-label classification** model using a **ClassifierChain** with a base estimator (e.g., **XGBoost**).  
+    - Build a **multi-label classification** model using a **ClassifierChain** with a base estimator (e.g., **Random Forest**).  
     - Use **GridSearchCV** for **hyperparameter tuning** to optimize model performance.
 
     **6. Model Evaluation:**  
-    - Evaluate the model using metrics such as **F1 Score** and **Hamming Loss**.  
+    - Evaluate the model using metrics such as **Recall** and **F1 Score**.  
     - Generate a **classification report** to assess test performance.
 
     **7. Product Recommendation:**  
@@ -328,4 +348,3 @@ if page == "Project Flow":
     st.markdown(
         "This systematic approach ensures that insights from **association rule mining** are effectively integrated with **predictive modeling** to enhance the product recommendation process."
     )
-
