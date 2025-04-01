@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 # load saved model
-model = read_model('b3-measuring-campaign-roi.pkl')
+model = read_model('b3_measuring_campaign_roi.pkl')
 
 def user_input_features():
     # Numerical inputs
