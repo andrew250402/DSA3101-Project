@@ -127,8 +127,8 @@ st.markdown("""
 st.image(read_image("B5_churn_coefficient.png"))
 
 def load_data_and_model():
-    seg_model = read_model('a5-streamlit-segment.pkl')
-    logr_model = read_model('b5-customer-retention-strategies.pkl')
+    seg_model = read_model('a5_streamlit_segment.pkl')
+    logr_model = read_model('b5_customer_retention_strategies.pkl')
     segment, logr = ([seg_model['birch_model'], seg_model['scaler'], seg_model['ipca_model'], seg_model['customers'], seg_model['customer_encoded']],
                     [logr_model['num_cols'], logr_model['logr_model'], logr_model['scaler'], logr_model['cluster_columns']])
     return segment, logr
