@@ -17,7 +17,7 @@ page = st.sidebar.selectbox("Select Page", ["Project Flow", "Model Performance",
 
 # Path Setup
 base_dir = os.path.dirname(os.path.abspath(__file__))
-csv_path = os.path.join(base_dir, "..", "Data DSA3101", "customer_data_with_labels_only.csv")
+csv_path = os.path.join(base_dir, "..", "data", "customer_data_with_labels_only.csv")
 
 @st.cache_data
 def load_and_train_model():
