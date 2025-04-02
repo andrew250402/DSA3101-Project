@@ -348,7 +348,11 @@ elif page == "Project Flow":
     st.markdown(
         "This systematic approach ensures that insights from **association rule mining** are effectively integrated with **predictive modeling** to enhance the product recommendation process."
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     )
+=======
+    )
+>>>>>>> Stashed changes
 =======
     )
 >>>>>>> Stashed changes
