@@ -14,7 +14,7 @@ import pickle
 
 def load_data_and_model():
     # Load customer data
-    customer_data = pd.read_csv('../Data DSA3101/customers.csv')
+    customer_data = pd.read_csv('../data/customers.csv')
 
     # Data cleaning and processing
     ## Filter out entries with erroneous data such as negative income and created_at dates from the future.
