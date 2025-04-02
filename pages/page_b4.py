@@ -6,19 +6,23 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# Show title of Page B4
 st.title("Personalisation with Cost-Effectiveness in Marketing Campaigns")
 
-
-
+# Show the campaign dataset
 st.title("Campaigns Dataset")
 try:
     campaigns = read_csv('campaigns.csv')
     st.dataframe(campaigns)
 except FileNotFoundError as e:
     st.error(str(e))
-#Get ROI
+
+# Get ROI
 campaigns["ROI"] = (campaigns["total_revenue_generated"] - campaigns["total_campaign_cost"]) / campaigns["total_campaign_cost"]
+
 # Define multipliers for campaign type and customer segment
+# Personalisation score has to be assigned this way because every campaigns available in the dataset offer a specific product to a specific segment though a specific channel
+# There are no other indication of personalisation so the personalisation score has to be inferred this way
 campaigns_type_mult = {
     "Mobile App Notifications": 1.3,
     "Email": 1.2,
@@ -51,12 +55,11 @@ campaigns["product_pers_score"] = campaigns["recommended_product_name"].map(prod
 
 # Compute personalization score
 campaigns["pers_score"] = campaigns["type_mult"] * campaigns["seg_mult"] * campaigns["product_pers_score"]
-# Display the updated DataFrame
-print(campaigns[["campaign_id", "campaign_type", "customer_segment", "pers_score"]].head())
 
-
+# Section to explain why each category was assigned to a different multiplier
 st.title("Personalisation Score Multipliers and Rationales")
 
+# Display table to rationalise campaign types and multipliers
 st.write("### Campaign Types")
 campaign_type = {
     "Campaign Type": ["Mobile App Notifications", "Email", "SMS", "Direct Mail"],
@@ -73,6 +76,7 @@ campaign_type_table = campaign_type_table.style.set_table_styles([
 ])
 st.dataframe(campaign_type_table)
 
+# Display table rationalise customer segments and multipliers
 st.write("### Customer Segment")
 customer_segment = {
     "Campaign Type": ["High-Value", "Young Professionals", "Middle-Market", "Retired", "Budget-Conscious"],
@@ -90,6 +94,7 @@ customer_segment_table = customer_segment_table.style.set_table_styles([
 ])
 st.dataframe(customer_segment_table)
 
+# Display table to rationalise recommended products and multipliers
 st.write("### Recommended Product")
 
 recommended_product = {
@@ -121,21 +126,46 @@ correlation_recommended_product = campaigns.groupby('recommended_product_name').
 correlation_recommended_product.columns = ['Recommended Product', 'Correlation (ROI vs. Pers. Score)']
 
 # Function to return the action and strategy based on correlation
+# The higher the correlation, the more personalised should be for the specific category
+# On the other hand, if correlation is negative, being more personalised would not be effective and thus the strategy is to be generic for these categories
+
 def get_action_strategy(correlation_value):
+    """
+    Determines the recommended action and strategy based on the correlation between ROI and personalization score.
+
+    Args:
+        correlation_value (float): The correlation coefficient between ROI and personalization score, 
+                                   ranging from -1 to 1.
+
+    Returns:
+        tuple: A tuple containing:
+            - str: The recommended action to take based on the correlation.
+            - str: The corresponding strategy for the given correlation.
+
+    Example:
+        >>> get_action_strategy(0.8)
+        ('High Personalization Focus', 'Invest more on personalization efforts (e.g., high personalization emails, notifications)')
+        
+        >>> get_action_strategy(-0.5)
+        ('Avoid Excessive Personalization', 'Use mass-market campaigns, avoid deep personalization')
+
+    Notes:
+        - A high positive correlation (≥ 0.7) suggests focusing on deep personalization.
+        - A moderate correlation (0.3 - 0.7) indicates that personalization is effective but should be tested.
+        - A low or negative correlation suggests minimizing personalization efforts.
+    """
     if 0.7 <= correlation_value <= 1:
-        return "High Personalization Focus", "Double down on personalization efforts (e.g., high personalization emails, notifications)"
+        return "High Personalization Focus", "Invest more on personalization efforts (e.g., high personalization emails, notifications)"
     elif 0.3 <= correlation_value < 0.7:
         return "Moderate Personalization", "Continue with personalized efforts, test different strategies"
     elif 0 <= correlation_value < 0.3:
-        return "Minimal Personalization", "Focus on light personalization or segment-based targeting"
-    elif 0 <= correlation_value < -0.3:
         return "Cost-Effective or Generic", "Use broad targeting with minimal personalization"
     elif -1 <= correlation_value < 0:
         return "Avoid Excessive Personalization", "Use mass-market campaigns, avoid deep personalization"
     else:
         return None, None  # In case of invalid correlation values
 
-# Streamlit UI
+# Show ROI and Personalisation Score Analysis
 st.title("ROI vs. Personalization Score Analysis")
 
 # Radio button for plot selection
@@ -144,7 +174,7 @@ plot_choice = st.radio(
     ["Campaign Type", "Customer Segment", "Recommended Product"]
 )
 
-# Select category (simulate hover behavior)
+# Select category
 if plot_choice == "Campaign Type":
     category = st.selectbox("Select Campaign Type:", ["All"] + list(campaigns['campaign_type'].unique()))
     if category == "All":
