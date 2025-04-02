@@ -14,9 +14,9 @@ from sklearn.metrics import silhouette_score
 #                     DATA LOADING                          
 # ==========================================================
 # Load datasets
-Transaction = pd.read_csv('transactions_summary.csv')
-Usage = pd.read_csv('digital_usage.csv')
-Customers = pd.read_csv('customers.csv')
+Transaction = pd.read_csv('../data/transactions_summary.csv')
+Usage = pd.read_csv('../data/digital_usage.csv')
+Customers = pd.read_csv('../data/customers.csv')
 
 # ==========================================================
 #                     DATA CLEANING                         

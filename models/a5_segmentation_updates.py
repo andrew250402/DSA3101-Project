@@ -10,7 +10,7 @@ from sklearn.preprocessing import StandardScaler
 from scipy.cluster.hierarchy import linkage, dendrogram
 
 # Load customer data
-customer_data = pd.read_csv('../Data DSA3101/customers.csv')
+customer_data = pd.read_csv('../data/customers.csv')
 # Data cleaning and processing
 ## Filter out entries with erroneous data such as negative income and created_at dates from the future.
 ## For our project, we also consider customers below the age of 21 to be erroneous entries.
@@ -22,7 +22,7 @@ customer_data = customer_data.drop(columns=['created_at'])
 customer_data.head()
 
 # Load usage data
-usage_data = pd.read_csv('../Data DSA3101/digital_usage.csv')
+usage_data = pd.read_csv('../data/digital_usage.csv')
 # Data cleaning and processing
 ## Remove columns that are not needed for our analysis.
 usage_data = usage_data.drop(columns=['last_mobile_login', 'last_web_login'])
@@ -30,7 +30,7 @@ usage_data = usage_data.drop(columns=['last_mobile_login', 'last_web_login'])
 usage_data.head()
 
 # Load transaction data
-transaction_data = pd.read_csv('../Data DSA3101/transactions_summary.csv')
+transaction_data = pd.read_csv('../data/transactions_summary.csv')
 # Data cleaning and processing
 ## Filter out entries with erroneous data, specifically entries with negative balance and spending.
 transaction_data = transaction_data[transaction_data['current_balance'] >= 0]
