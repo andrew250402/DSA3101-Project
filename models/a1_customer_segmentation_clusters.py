@@ -57,10 +57,11 @@ scaled_data = scaler.fit_transform(customer_data_encoded)
 # ==========================================================
 # Perform PCA for dimensionality reduction
 # Create a Scree Plot to decide the number of components to use
-'''
+
 pca = PCA().fit(scaled_data)
 
 # Below is the scree plot
+'''
 plt.plot(np.cumsum(pca.explained_variance_ratio_))
 plt.xlabel('Number of Components')
 plt.ylabel('Cumulative Explained Variance')
@@ -162,9 +163,8 @@ scaled_data = data_scaler.fit_transform(df_encoded)
 # Create a Scree Plot to decide the number of components to use
 pca = PCA().fit(scaled_data)
 
-'''
 # Below is the scree plot
-
+'''
 plt.plot(np.cumsum(pca.explained_variance_ratio_))
 plt.xlabel('Number of Components')
 plt.ylabel('Cumulative Explained Variance')
