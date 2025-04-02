@@ -7,15 +7,7 @@ import pandas as pd
 # load saved model
 model = read_model('b3_measuring_campaign_roi.pkl')
 
-def user_input_features():
-    # Numerical inputs
-    
-                                    
-    # Categorical inputs
-    return
-
-
-st.title("Measuring and maximising return on investment ROI for personalised marketing efforts")
+st.title("Measuring and maximising return on investment (ROI) for personalised marketing efforts")
 st.header("📊 Model Overview:")
 st.markdown("""
 Our model, a **Gradient Boosting Classifier (GBC)** was trained on feature-engineered
@@ -47,7 +39,9 @@ can also enable strategic decision making by translating complex metrics into mo
 comprehensible and actionable business insights.
 """)
 
-st.subheader("Campaign ROI Prediction")
+st.divider()
+
+st.header("Campaign ROI Prediction")
 st.markdown("""
 Adjust sliders and dropdown menus below to create a personalised marketing campaign 
 targeting a customer segment of your choice. Afterwards, click "Predict" to see the
@@ -55,12 +49,12 @@ ROI prediction of your campaign in real-time.
 """)
 
 # Taking in User Input
-st.header("Campaign Parameters:")
+st.subheader("Campaign Parameters:")
 customer_segment = st.selectbox(
     "Customer Segment",
     ["Middle Market", "Retired", "Budget-Conscious","High-Value","Young Professionals"]
 )
-total_campaign_cost = st.slider("Total Campaign Cost ($)", 10000, 110000)
+total_campaign_cost = st.slider("Total Campaign Cost ($)", 10000, 110000) 
 campaign_duration = st.slider("Duration of Campaign (Days)", 30, 60)
 conversion_rate = st.slider("Conversion Rate (%)", 5, 15)
 acquisition_cost = st.slider("Acquisition Cost ($)", 150, 7000)
@@ -73,21 +67,28 @@ campaign_type = st.selectbox(
     ["Email", "Mobile App Notifications", "SMS"]
 )
 
-# creating an input_dictionary
+# Create a dictionary to store user-inputted campaign parameters
 input_dict = {
-    'total_campaign_cost': total_campaign_cost,
-    'campaign_duration': campaign_duration,
-    'conversion_rate': conversion_rate/100,
-    'acquisition_cost': acquisition_cost,
+    'total_campaign_cost': total_campaign_cost, # Total budget allocated for the campaign ($)
+    'campaign_duration': campaign_duration, # Duration of the campaign in days
+    'conversion_rate': conversion_rate/100, # Conversion rate as a decimal (percentage divided by 100)
+    'acquisition_cost': acquisition_cost, # Cost to acquire a single customer ($)
+    
+    # One-hot encoding for customer segments (binary representation
     'customer_segment_Retired': 1 if customer_segment == "Retired" else 0,
     'customer_segment_Young Professionals': 1 if customer_segment == "Young Professionals" else 0,
+
+    # One-hot encoding for product type (binary representation)
     'product_Credit Card': 1 if product_type == "Credit Card" else 0,
     'product_Personal Loan': 1 if product_type == "Personal Loan" else 0,
+
+    # One hot encoding for campaign channel (binary representation)
     'campaign_type_Email': 1 if campaign_type == "Email" else 0,
     'campaign_type_Mobile App Notifications': 1 if campaign_type == "Mobile App Notifications" else 0,
     'campaign_type_SMS': 1 if campaign_type == "SMS" else 0
 }
 
+# List of features used by model for prediction
 model_features = [
     'total_campaign_cost',
     'campaign_duration',
@@ -102,44 +103,57 @@ model_features = [
     'campaign_type_SMS'
 ]
 
-# make prediction
+# Convert input dictionary to DataFrame and select required features
 input_df = pd.DataFrame([input_dict])[model_features]
 
-# adding predict button
+# Prediction Button and Results display
 if st.button("Predict!"):
+    # input_df created with the required features generated above, from user input
     prediction = model.predict(input_df)
+    proba = model.predict_proba(input_df) # Gets probability for each class
+
+    st.divider()
+    st.subheader("🎯 Prediction Results")
+    
+    # extracting the predicted ROI class (Low/Medium/High)
     roi_class = prediction[0]
+    
+    # Colour mapping for better visual emphasis of results
     color = {
         "Low": "red",
         "Medium": "orange",
         "High": "green"
     }[roi_class]
+    
+    # Display prediction with coloured text
     st.markdown(
-        f"### Predicted ROI Category: <span style='color:{color}; font-size:28px'>{roi_class}</span>",
+        f"#### Predicted ROI Category: <span style='color:{color}; font-size:24px'>{roi_class}</span>",
         unsafe_allow_html=True
     )
+
+    # Display prediction probabilities for each class
+    st.write("#### Confidence Levels")
+    prob_df = pd.DataFrame({
+        "ROI Class": ['Low 🔴', 'Medium 🟡', 'High 🟢'],
+        "Probability": [f"{p:.1%}" for p in [proba[0][1], proba[0][2], proba[0][0]]] # reorder rows due to class misalignment
+    }) 
+    st.write(prob_df)
+    
+    # Actions to take based on ROI Classes
     st.markdown("#### Follow-up Actions:")
     if roi_class == "High":
         st.markdown("""
-        - Scale such campaigns to similar audiences
-        - Allocate additional budget to such campaigns
-        - Monitor campaign for any slow down in engagement
+        - ⚖️ Scale such campaigns to similar audiences
+        - ✅ Allocate additional budget to such campaigns
+        - 👀 Monitor campaign for any slow down in engagement
         """)
     if roi_class == "Low" or roi_class == "Medium":
         st.markdown("""
-        - Reallocate budget from underperforming segments
-        - Consider alternative marketing channels
-        - Re-evaluate selection of target audience
+        - 🔄 Reallocate budget from underperforming segments
+        - 📢 Consider alternative marketing channels
+        - 🎯 Re-evaluate selection of target audience
         """)
-        
-        
 
 st.divider()
 
-# Model Evaluation
 
-# Display results
-st.subheader("Prediction Results")
-
-# Show the input values
-st.write(model.feature_names_in_)
