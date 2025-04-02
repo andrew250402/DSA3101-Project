@@ -11,16 +11,17 @@ from imblearn.over_sampling import SMOTE
 
 """
 b3_measuring_campaign_roi.py
---------
+-----------------------------
 This script trains a Gradient Boosting Classifier and saves it as a .pkl file in the /Saved folder.
 The model predicts ROI classes based on inputtable campaign parameters.
+Model evaluation is also included as a function to verify model effectiveness.
 
 Dependencies:
 - pandas, sklearn, numpy, pickle, imbalanced-learn
 
 Usage:
 - Run this script to train and save the Gradient Boosting Classifier model (already done).
-- Uncomment lines 173 onwards if the model needs to be retrained. This saves a new .pkl file in /Saved which is utilised by pages/page_b3.py.
+- Uncomment lines 255 onwards if the model needs to be retrained. This saves a new .pkl file in /Saved which is utilised by pages/page_b3.py.
 """
 
 def load_and_preprocess_data():
@@ -49,10 +50,10 @@ def load_and_preprocess_data():
         >>> processed_data = load_and_preprocess_data()
     """
     # loading relevant data
-    campaigns = pd.read_csv("../Data DSA3101/campaigns.csv")
-    customer_engagement = pd.read_csv("../Data DSA3101/customer_engagement.csv")
-    customers = pd.read_csv("../Data DSA3101/customers.csv")
-    transactions = pd.read_csv("../Data DSA3101/transactions_summary.csv")
+    campaigns = pd.read_csv("../data/campaigns.csv")
+    customer_engagement = pd.read_csv("../data/customer_engagement.csv")
+    customers = pd.read_csv("../data/customers.csv")
+    transactions = pd.read_csv("../data/transactions_summary.csv")
 
     # feature engineering conversion_rate
     # calculate total engagements (sent = "Yes"), engagement is irregardless of active/passive participation

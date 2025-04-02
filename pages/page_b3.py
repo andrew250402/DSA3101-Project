@@ -7,7 +7,6 @@ import pandas as pd
 # load saved model
 model = read_model('b3_measuring_campaign_roi.pkl')
 
-
 st.title("Measuring and maximising return on investment (ROI) for personalised marketing efforts")
 st.header("📊 Model Overview:")
 st.markdown("""
@@ -125,12 +124,20 @@ if st.button("Predict!"):
         "Medium": "orange",
         "High": "green"
     }[roi_class]
-
+    
     # Display prediction with coloured text
     st.markdown(
         f"#### Predicted ROI Category: <span style='color:{color}; font-size:24px'>{roi_class}</span>",
         unsafe_allow_html=True
     )
+
+    # Display prediction probabilities for each class
+    st.write("#### Confidence Levels")
+    prob_df = pd.DataFrame({
+        "ROI Class": ['Low 🔴', 'Medium 🟡', 'High 🟢'],
+        "Probability": [f"{p:.1%}" for p in [proba[0][1], proba[0][2], proba[0][0]]] # reorder rows due to class misalignment
+    }) 
+    st.write(prob_df)
     
     # Actions to take based on ROI Classes
     st.markdown("#### Follow-up Actions:")
@@ -148,7 +155,5 @@ if st.button("Predict!"):
         """)
 
 st.divider()
-
-st.header("Model Evaluation")
 
 

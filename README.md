@@ -8,6 +8,7 @@ This repository contains a Streamlit application that can be run inside a Docker
 ## 🚀 Setting up Docker
 
 ### 1. Clone the Repository
+Open Git Bash in the directory of your choice and use the following commands:
 ```bash
 git clone https://github.com/andrew250402/DSA3101-Project.git
 cd DSA3101-Project
@@ -73,6 +74,7 @@ If you want to rerun the docker container, you can do so without having to perfo
 ## 🚀 Setting up Python Virtual Environment (venv)
 
 ### 1. Clone the Repository
+Open Git Bash in the directory of your choice and use the following commands:
 ```bash
 git clone https://github.com/andrew250402/DSA3101-Project.git
 cd DSA3101-Project
