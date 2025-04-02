@@ -20,9 +20,11 @@ except FileNotFoundError as e:
 # Get ROI
 campaigns["ROI"] = (campaigns["total_revenue_generated"] - campaigns["total_campaign_cost"]) / campaigns["total_campaign_cost"]
 
-# Define multipliers for campaign type and customer segment
-# Personalisation score has to be assigned this way because every campaigns available in the dataset offer a specific product to a specific segment though a specific channel
-# There are no other indication of personalisation so the personalisation score has to be inferred this way
+# Define multipliers for campaign type, customer segment, and recommended products.
+# We chose to define personalisation score through multipliers because each campaign in the dataset 
+# is tailored to a specific product, targeting a specific customer segment through a specific channel.
+# Since there are no direct indicators of personalisation, the score is best inferred based on these factors.
+# Refer to line 69, 86 and 105 for reasoning for choice of each multiplier
 campaigns_type_mult = {
     "Mobile App Notifications": 1.3,
     "Email": 1.2,
