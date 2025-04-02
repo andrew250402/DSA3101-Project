@@ -87,6 +87,8 @@ data[feature_cols] = data[feature_cols].fillna(method='ffill')
 """
 Apply the **Apriori algorithm** to the product columns to discover frequent itemsets with a minimum support of 0.5.
 Then, derive **association rules** with a minimum confidence threshold of 0.7.
+We chose this method as applying the Apriori algorithm helps uncover frequent product combinations, 
+while association rules identify strong purchase relationships, enabling better recommendations and targeted marketing. 
 """
 frequent_itemsets = apriori(data[product_cols], min_support=0.5, use_colnames=True)
 rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.7)
@@ -131,6 +133,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 """
 Initialize an **XGBClassifier** as the base estimator for the **ClassifierChain**.
 ClassifierChain is employed to handle the multi-label classification scenario.
+We chose this model as ClassifierChain with XGBClassifier improves prediction accuracy by 
+modeling interdependencies between customer preferences, making it superior to independent multi-label approaches
 A **macro F1 score** is defined as the evaluation metric to provide balanced performance across labels.
 Hyperparameters for the base estimator are tuned using **GridSearchCV** with 3-fold cross-validation.
 """
