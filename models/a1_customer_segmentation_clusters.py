@@ -26,29 +26,37 @@ Transaction = Transaction[Transaction['current_balance'] >= 0]
 Transaction = Transaction[Transaction['peak_month_spending'] >= 0]
 
 # Cleaning Usage Dataset
-Usage['has_mobile_app'] = Usage['has_mobile_app'].replace({'Yes': 1, 'No': 0})
+## Remove columns that are not needed for our analysis.
+Usage['has_mobile_app'] = Usage['has_mobile_app'].replace({'Yes': 1, 'No': 0}) 
 Usage['has_web_account'] = Usage['has_web_account'].replace({'Yes': 1, 'No': 0})
-Usage = Usage.drop(columns=['last_mobile_login', 'last_web_login'])
+Usage = Usage.drop(columns=['last_mobile_login', 'last_web_login']) 
 
 # Cleaning Customers Dataset
+# Filter out entries with erroneous data such as negative income and created_at dates from the future.
+# For our project, we also consider customers below the age of 21 to be erroneous entries.
 binary_columns = ['credit_default', 'credit_card', 'personal_loan', 'mortgage', 'savings_account', 'investment_product', 'auto_loan', 'wealth_management']
-Customers[binary_columns] = Customers[binary_columns].replace({'yes': 1, 'no': 0})
-Customers = Customers[(Customers['income'] >= 0) & (Customers['age'] >= 21)]
+Customers[binary_columns] = Customers[binary_columns].replace({'yes': 1, 'no': 0}) 
+Customers = Customers[(Customers['income'] >= 0) & (Customers['age'] >= 21)] 
 Customers = Customers[Customers['created_at'] < '2025-03-01']
-Customers = Customers.drop(columns=['customer_segment']) # Remove column
+Customers = Customers.drop(columns=['customer_segment']) # To avoid having our results influenced by the old clusters, they are also removed.
 customers_copy = Customers.copy() # To be used for saving as CSV
-Customers = Customers.drop(columns=['created_at']) # Remove column
+Customers = Customers.drop(columns=['created_at']) # Not useful for clustering
 customer_data_original = Customers.copy() # To be used for merging
-Customers = Customers.drop(columns=['customer_id']) # Remove column
+Customers = Customers.drop(columns=['customer_id']) # Customer_id is not informative and should not be used in the analysis.
+
 
 
 # ==========================================================
 #                 FEATURE ENGINEERING                      
 # ==========================================================
 # One-hot encoding for categorical variables
+# PCA (Principal Component Analysis) works by calculating variance between different columns, so our data needs to be numerical.
+# One-hot encoding converts all categorical variables into values of 0 and 1, allowing PCA to do its computations.
 customer_data_encoded = pd.get_dummies(Customers)
 
 # Standardizing data
+# PCA is sensitive to the scale of different features.
+# Standardising every feature to have a mean of 0 and standard deviation of 1 ensures that all features have equal importance in PCA.
 scaler = StandardScaler()
 scaled_data = scaler.fit_transform(customer_data_encoded)
 
@@ -61,6 +69,8 @@ scaled_data = scaler.fit_transform(customer_data_encoded)
 pca = PCA().fit(scaled_data)
 
 # Below is the scree plot
+# A Scree Plot shows the explained variance of each component from PCA.
+# We should pick just enough components to ensure the cumulative explained variance is at least 95%, so we chose to keep 22 components.
 '''
 plt.plot(np.cumsum(pca.explained_variance_ratio_))
 plt.xlabel('Number of Components')
@@ -76,6 +86,8 @@ scaled_data_pca = pca.fit_transform(scaled_data)
 linkage_matrix = linkage(scaled_data_pca, method='ward')
 
 # Below is the dendrogram plot
+# A dendrogram is a tree-like diagram that shows the hierarchical relationship between data points.
+# We choose 4 clusters based on the dendrogram plot, where the red line intersects the dendrogram.
 '''
 # Plot dendrogram
 plt.figure(figsize=(10, 5))
@@ -106,7 +118,9 @@ for n_clusters in cluster_range:
     cluster_labels = kmeans.fit_predict(scaled_data_pca)
     silhouette_scores.append(silhouette_score(scaled_data_pca, cluster_labels))
 
-# Below is the Silhouette Score plot
+# Below is the Silhouette Score plot to find the chosen K
+# The Silhouette Score is a measure of how similar an object is to its own cluster compared to other clusters.
+# K was chosen to be 4 as it has the highest Silhouette Score between 2 to 5 clusters.
 '''
 # Plot Silhouette Score
 plt.subplot(1, 2, 2)
@@ -164,6 +178,8 @@ scaled_data = data_scaler.fit_transform(df_encoded)
 pca = PCA().fit(scaled_data)
 
 # Below is the scree plot
+# A Scree Plot shows the explained variance of each component from PCA.
+# We should pick just enough components to ensure the cumulative explained variance is at least 95%, so we chose to keep 40 components.
 '''
 plt.plot(np.cumsum(pca.explained_variance_ratio_))
 plt.xlabel('Number of Components')
@@ -213,7 +229,8 @@ for n_clusters in cluster_range:
     cluster_labels = kmeans.fit_predict(scaled_data_pca)
     silhouette_scores.append(silhouette_score(scaled_data_pca, cluster_labels))
 
-# Below is the Silhouette Score plot
+# Below is the Silhouette Score plot to find the chosen K
+# K was chosen to be 3 as it has the highest Silhouette Score.
 '''
 # Plot Silhouette Score
 plt.subplot(1, 2, 2)
