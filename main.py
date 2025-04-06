@@ -436,6 +436,35 @@ else:
         - Enhanced cross-selling opportunities through data-driven insights
         """)
 
+
+
+else:
+    st.markdown("""
+        <style>
+        div[data-testid="stMarkdownContainer"] p, 
+        div[data-testid="stMarkdownContainer"] li, 
+        div[data-testid="stMarkdownContainer"] ul {
+            font-size: 18pt !important;
+            line-height: 1.5 !important;
+            margin-bottom: 12px !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+    st.title("Conclusion")
+    st.markdown("---")
+
+    # Main Content Section
+    st.header("🏆 Banking Analytics Impact Summary")
+
+    # Revenue Growth Section
+    with st.expander("🎯 Revenue Growth Through Precision Engagement", expanded=False):
+        st.markdown("""
+        - Higher conversion rates from segment-specific personalization
+        - Increase in CLV via predictive next-best-product recommendations
+        - Enhanced cross-selling opportunities through data-driven insights
+        """)
+
     # Cost Efficiency Section
     with st.expander("📈 Cost Efficiency & Resource Optimization", expanded=False):
         st.markdown("""
@@ -451,3 +480,4 @@ else:
         - Continuous performance improvement through self-learning A/B testing frameworks
         - Regulatory resilience with built-in privacy protections and compliance safeguards
         """)
+
