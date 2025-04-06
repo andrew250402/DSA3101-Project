@@ -1,8 +1,10 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from streamlit_utilities import read_csv, read_image, read_model
 # 
-df = pd.read_csv("../data/A4_metrics.csv")
+# df = pd.read_csv("../data/A4_metrics.csv")
+df = read_csv('A4_metrics.csv')
 df['ROI'] = df['total_profit']/df['total_campaign_cost']
 st.set_page_config(page_title="Marketing Campaign Analysis", layout="wide")
 
