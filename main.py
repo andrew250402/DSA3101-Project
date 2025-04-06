@@ -153,7 +153,7 @@ elif selected_page == "Analysis/Insights":
             st.markdown("""
             - **Profile:** Older demographic, risk-averse
             - **Needs:** Retirement planning, FDIC-insured products
-            - **Engagement:** Prefers in-branch consultations
+            - **Engagement:** Digital banking engagement
             """)
         
         with st.expander("👔 High-Value Customers", expanded=False):
@@ -165,7 +165,7 @@ elif selected_page == "Analysis/Insights":
         
         with st.expander("💳 Everyday Spenders", expanded=False):
             st.markdown("""
-            - **Profile:** Frequent card users, urban millennials
+            - **Profile:** Frequent card users
             - **Needs:** Cashback rewards, instant financing
             - **Engagement:** Mobile-first banking users
             """)
@@ -175,47 +175,13 @@ elif selected_page == "Analysis/Insights":
         st.image(read_image("a5_dendrogram.png"), use_container_width=True)
         st.caption("Figure 1: Customer segmentation dendrogram showing 3 distinct clusters")
 
-    # Action Section with Highlight
-    st.markdown("---")
-    with st.container():
-        st.subheader("🚀 Recommended Actions")
-        cols = st.columns(3)
-        
-        with cols[0]:
-            st.markdown("""
-            **👴 Conservative Savers**
-            - Retirement planning workshops
-            - CD ladder strategies
-            - Estate planning services
-            """)
-        
-        with cols[1]:
-            st.markdown("""
-            **👔 High-Value Customers**
-            - Private banking offers
-            - Alternative investments
-            - Priority concierge service
-            """)
-        
-        with cols[2]:
-            st.markdown("""
-            **💳 Everyday Spenders**
-            - Cashback boost campaigns
-            - Instant personal loans
-            - Mobile app feature tutorials
-            """)
-        
-        st.markdown("""
-        <style>
-        .stContainer {background-color: #f5faff; border-radius: 10px; padding: 20px;}
-        </style>
-        """, unsafe_allow_html=True)
 
     st.divider()
     st.divider()
 
         # --- Optimized Campaigns Section ---
     st.header("🎯 Optimized Campaigns for Maximum ROI")
+    st.markdown("---")
     with st.container():
         col1, col2 = st.columns([2, 1], gap="medium")
         
@@ -254,54 +220,25 @@ elif selected_page == "Analysis/Insights":
 
     # --- Predictive Analytics Section ---
     st.header("🔮 Predictive Analytics for Proactive Engagement")
+    st.markdown("---")
     with st.container():
         st.subheader("🔍 Key Insights & Methodology")
+
         col1, col2 = st.columns([2, 1])
         
         with col1:
-            with st.expander("**🔄 Apriori Product Affinities Engine**", expanded=False):
+            with st.expander("**🔄 Apriori Product Affinities Engine**", expanded=True):
                 st.markdown("""
                 - Product affinity detection
                 - Market basket analysis
                 - Cross-sell recommendations
                 """)
             
-            with st.expander("**🌳 Random Forest Product Recommendation**", expanded=False):
-                st.markdown("""
-                - Product adoption likelihood
-                - Feature importance ranking
-                - Customer propensity scoring
-                """)
-            
-            with st.expander("**📉 Logistic Model Churn Prediction**", expanded=False):
-                st.markdown("""
-                - Churn risk prediction
-                - Early warning system
-                - Retention scoring
-                """)
         with col2:
-            st.subheader("📈 Feature Importance")
-            st.image(read_image("b5_churn_coefficient.png"), use_container_width=True)
-            st.caption("Figure 2: Customer churn feature importance for churn probability")
-        
-        st.markdown("---")
-        col1, col2 = st.columns(2)
-        
-        with col1:
             st.markdown("""
             #### 🔍 Behavioral Insights
             - **Credit Card Holders**: 73% loan adoption likelihood
             - **Affinity Patterns**: Savings + Insurance bundle potential
-            """)
-        
-        with col2:
-            st.markdown("""
-            #### 🛡️ Retention Strategy
-            - **Churn Signals**:
-                - 💸 High-Value: Transaction decline >40%
-                - 📱 Everyday: Mobile logins drop >60%
-                - 👴 General: Inactivity >180 days
-            - Targeted products and offers to retain at-risk customers
             """)
 
     st.divider()
@@ -309,6 +246,7 @@ elif selected_page == "Analysis/Insights":
 
     # --- Personalization Section ---
     st.header("⚖️ Balancing Personalization & Cost Efficiency")
+    st.markdown("---")
     with st.container():
         st.subheader("🔍 Key Insights & Methodology")
         cols = st.columns([2,1])
@@ -352,59 +290,152 @@ elif selected_page == "Analysis/Insights":
 
 
 elif selected_page == "Proposed Solution/ Deployment Strategy":
-    st.title("Proposed Solution/ Deployment Strategy")
-
-    st.subheader("Segment-Specific A/B Testing")
     st.markdown("""
-    Conduct controlled experiments across all customer segments to determine the optimal:
-
-- **Channel preferences**  
-  (e.g., SMS vs. Email vs. Push Notifications)
-
-- **Timing strategies**  
-  (e.g., Day of Week / Time of Day)
-
-- **Creative approaches**  
-  (e.g., Personalized Messaging vs. Product-Focused Messaging)
-                """)
-    st.subheader("Real-Time Model Updates")
-    st.markdown("""
-    Establish automated BIRCH and IPCA pipeline models using:
+        <style>
+        div[data-testid="stMarkdownContainer"] p, 
+        div[data-testid="stMarkdownContainer"] li, 
+        div[data-testid="stMarkdownContainer"] ul {
+            font-size: 18pt !important;
+            line-height: 1.5 !important;
+            margin-bottom: 12px !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
     
-- Latest transaction data  
+    # --- Real-Time Personalization Engine ---
+    st.title("Proposed Solution/Deployment Strategy")
+    st.header("📊 Smart Customer Segmentation Solution")
+    st.markdown("---")
+    with st.container():
+        
+        col1, col2 = st.columns([2, 1], gap="large")
+        
+        with col1:
+            st.markdown("""
+            #### 🧠 Dynamic Clustering Framework
+            """)
+            
+            with st.expander("📊 Data Processing Architecture", expanded=True):
+                st.markdown("""
+                            - **Initial Data Clustering**: Hierarchical clustering for segment identification
+                            - **Real-time Data Processing**: Incremental PCA for updating insights
+                            - **Scalable Clustering**: BIRCH for lower cost and faster clustering building on the initial clustering
+                            """)
+        with col2:
+            st.markdown("""
+            #### 🧠 Benefits
+            """)
+            st.success("""
+            **Budget Reallocation Strategy**
+            - 📱 Consumer Trends Tracking
+            - 🚀 Real-Time Adaptive Model
+            - 🎯 Competitive Positioning
+            """)
+    st.markdown("---")
+    with st.container():
+        st.subheader("🚀 Recommended Segment Approaches")
+        cols = st.columns(3)
+            
+        with cols[0]:
+            st.markdown("""
+            **👴 Conservative Savers**
+            - Retirement planning workshops
+            - CD ladder strategies
+            - Estate planning services
+            """)
+            
+        with cols[1]:
+            st.markdown("""
+            **👔 High-Value Customers**
+            - Private banking offers
+            - Personal loans with lower rates
+            - Priority concierge service
+            """)
+            
+        with cols[2]:
+            st.markdown("""
+            **💳 Everyday Spenders**
+            - Cashback boost campaigns
+            - Introduce entry-level investment tools
+            - Personalised mobile app features
+            """)
+            
+        st.markdown("""
+            <style>
+            .stContainer {background-color: #f5faff; border-radius: 10px; padding: 20px;}
+            </style>
+            """, unsafe_allow_html=True)
                 
-- Updated digital engagement patterns  
-                
-- Seasonal behavioral trends          
+    st.divider()
+    st.divider()
+
+    st.header("🔮 Predictive Solutions for Proactive Engagement")
+    # Action Section with Highlight
+    st.markdown("---")
+
+    col1, col2 = st.columns([2, 1], gap="large")
+    with col1:
+        with st.expander("**📉 Logistic Model Churn Prediction**", expanded=True):
+            st.markdown("""
+                - Churn risk prediction
+                - Early warning system
+                - Retention scoring
                 """)
-    st.subheader("Privacy")
+
+        st.markdown("""
+            #### 🛡️ Retention Strategy
+            - **Churn Signals**:
+                - 💸 High-Value: Transaction decline >40%
+                - 📱 Everyday: Mobile logins drop >60%
+                - 👴 General: Inactivity >180 days
+            - Targeted products and offers to retain at-risk customers
+            """)
+        
+    with col2:
+    # --- Predictive Retention Benefits ---
+        st.markdown("""
+        #### 📈 Predictive Retention Benefits
+        """)
+        st.success("""
+        **Benefits of Predictive Retention** 
+        ✓ **Smart Targeting**:  
+        - Auto-match products to customer life stages  
+        - Trigger offers when churn risk >50%  
+
+        ✓ **Measurable Impact**:  
+        - ↓ preventable churn  
+        - ↑ ROI on retention spend  
+        - ↑ meaningful customer engagement
+        """)
+
+    
+else:
     st.markdown("""
-    Implement differential privacy techniques to:
+        <style>
+        div[data-testid="stMarkdownContainer"] p, 
+        div[data-testid="stMarkdownContainer"] li, 
+        div[data-testid="stMarkdownContainer"] ul {
+            font-size: 18pt !important;
+            line-height: 1.5 !important;
+            margin-bottom: 12px !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
 
-- Anonymize customer data used for clustering
+    st.title("Conclusion")
+    st.markdown("---")
 
-- Add statistical noise to protect individual identities
+    # Main Content Section
+    st.header("🏆 Banking Analytics Impact Summary")
 
-- Maintain marketing effectiveness while complying with regulations
-                """)
+    # Revenue Growth Section
+    with st.expander("🎯 Revenue Growth Through Precision Engagement", expanded=False):
+        st.markdown("""
+        - Higher conversion rates from segment-specific personalization
+        - Increase in CLV via predictive next-best-product recommendations
+        - Enhanced cross-selling opportunities through data-driven insights
+        """)
 
-    st.subheader("Deployment Timeline")
-    st.markdown("""
-Phase 1 (Months 1–3): Pilot Implementation + Baseline A/B Tests
-- Deploy core segmentation models  
-- Establish testing framework for 2 smaller segments  
-- Capture initial optimization benchmarks  
-
-Phase 2 (Months 4–6): Scaling + Continuous Learning
-- Expand to all segments  
-- Implement automated model updates  
-- Introduce privacy safeguards  
-- Analyze A/B test results to refine strategies  
-
-Phase 3 (Months 7–12): Mature Optimization
-- Full automation of testing and model updates  
-- Privacy-by-design across all components
-                """)
 
 
 else:
