@@ -405,23 +405,48 @@ Phase 3 (Months 7–12): Mature Optimization
 - Full automation of testing and model updates  
 - Privacy-by-design across all components
                 """)
-else:
-    st.title("Conclusion")
 
-    st.subheader("Revenue Growth Through Precision Engagement")
+
+else:
     st.markdown("""
-- Higher conversion rates from segment-specific personalization
-- Increase in CLV via predictive next-best-product recommendations
-                """)
-    st.subheader("Cost Efficiency & Resource Optimization")
-    st.markdown("""
-- Reduction in wasted ad spend through AI-driven budget allocation
-- Lower customer acquisition costs via improved targeting accuracy
-- Relieves the need for manual segmentation through automated clustering
-                """)
-    st.subheader("Future-Proof Competitive Advantage")
-    st.markdown("""
-- Real-time adaptation to shifting customer behaviors and market trends
-- Continuous performance improvement through self-learning A/B testing frameworks
-- Regulatory resilience with built-in privacy protections and compliance safeguards
-                """)
+        <style>
+        div[data-testid="stMarkdownContainer"] p, 
+        div[data-testid="stMarkdownContainer"] li, 
+        div[data-testid="stMarkdownContainer"] ul {
+            font-size: 18pt !important;
+            line-height: 1.5 !important;
+            margin-bottom: 12px !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+    st.title("Conclusion")
+    st.markdown("---")
+
+    # Main Content Section
+    st.header("🏆 Banking Analytics Impact Summary")
+
+    # Revenue Growth Section
+    with st.expander("🎯 Revenue Growth Through Precision Engagement", expanded=False):
+        st.markdown("""
+        - Higher conversion rates from segment-specific personalization
+        - Increase in CLV via predictive next-best-product recommendations
+        - Enhanced cross-selling opportunities through data-driven insights
+        """)
+
+    # Cost Efficiency Section
+    with st.expander("📈 Cost Efficiency & Resource Optimization", expanded=False):
+        st.markdown("""
+        - Reduction in wasted ad spend through AI-driven budget allocation
+        - Lower customer acquisition costs via improved targeting accuracy
+        - Relieves the need for manual segmentation through automated clustering
+        """)
+
+    # Competitive Advantage Section
+    with st.expander("💪 Future-Proof Competitive Advantage", expanded=False):
+        st.markdown("""
+        - Real-time adaptation to shifting customer behaviors and market trends
+        - Continuous performance improvement through self-learning A/B testing frameworks
+        - Regulatory resilience with built-in privacy protections and compliance safeguards
+        """)
+

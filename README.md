@@ -94,7 +94,7 @@ pip install -r requirements.txt
 ```bash
 streamlit run main.py
 ```
-This command automatically opens htpp://localhost:8501 in your browser.
+This command automatically opens http://localhost:8501 in your browser.
 
 ---
 ### 🔧 Troubleshooting
