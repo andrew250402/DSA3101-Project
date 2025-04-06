@@ -5,7 +5,6 @@ import pandas as pd
 # Load data
 customer_engagement_df = read_csv('customer_engagement.csv')
 customer_df = read_csv('customers.csv')
-a4_df = read_csv('A4_metrics.csv')
 
 # load in plots
 product_usage = read_image("A3_mean_product_usage.png")
@@ -100,7 +99,6 @@ Focus on optimizing the mobile experience to increase engagement and deliver tar
     """)
 
 elif selected_page == "A4: Campaign Impact":
-    
     st.title("What are the key performance indicators (KPIs) for assessing the success of marketing campaigns?")
     st.write("""
 ### Campaign Performance Evaluation  

@@ -9,16 +9,51 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 from imblearn.pipeline import make_pipeline
 from imblearn.over_sampling import SMOTE
 
+"""
+b3_measuring_campaign_roi.py
+-----------------------------
+This script trains a Gradient Boosting Classifier and saves it as a .pkl file in the /Saved folder.
+The model predicts ROI classes based on inputtable campaign parameters.
+Model evaluation is also included as a function to verify model effectiveness.
 
+Dependencies:
+- pandas, sklearn, numpy, pickle, imbalanced-learn
 
-# loading in relevant datasets, preprocessing data/feature engineering
+Usage:
+- Run this script to train and save the Gradient Boosting Classifier model (already done).
+- Uncomment lines 255 onwards if the model needs to be retrained. This saves a new .pkl file in /Saved which is utilised by pages/page_b3.py.
+"""
 
 def load_and_preprocess_data():
+    """
+    Loads campaign, customer, engagement and transaction data then performs feature engineering.
+    To prepare for machine learning, key engineered features include
+        - Conversion rate (successful engagements / total_engagements)
+        - Customer acquisition cost (campaign cost / conversions)
+        - Average targeted CLV (Customer Lifetime Value)
+        - ROI categories (Low, Medium and High)
+
+    Data Sources:
+    - campaigns.csv: Campaign details (type, cost, dates, etc.)
+    - customer_engagement.csv: Records of customer interactions
+    - customers.csv: customer Profiles
+    - transactions_summary.csv: Summary of transactions for each registered customer with the bank
+
+
+    Returns:
+        pd.DataFrame: Processed dataset with original and engineered features ready for model training. Columns include:
+            - conversion_rate, acquisition_cost, avg_targeted_clv
+            - One-hot encoded campaign_type, product, customer_segment
+            - ROI category (Low/Medium/High)
+
+    Example usage:
+        >>> processed_data = load_and_preprocess_data()
+    """
     # loading relevant data
-    campaigns = pd.read_csv("../Data DSA3101/campaigns.csv")
-    customer_engagement = pd.read_csv("../Data DSA3101/customer_engagement.csv")
-    customers = pd.read_csv("../Data DSA3101/customers.csv")
-    transactions = pd.read_csv("../Data DSA3101/transactions_summary.csv")
+    campaigns = pd.read_csv("../data/campaigns.csv")
+    customer_engagement = pd.read_csv("../data/customer_engagement.csv")
+    customers = pd.read_csv("../data/customers.csv")
+    transactions = pd.read_csv("../data/transactions_summary.csv")
 
     # feature engineering conversion_rate
     # calculate total engagements (sent = "Yes"), engagement is irregardless of active/passive participation
@@ -94,7 +129,21 @@ def load_and_preprocess_data():
     return campaigns_encoded
 
 def selected_features():
-    # features (column names) for easier accessibility. features were selected based on feature importances
+    """
+    Returns a list of selected feature names for model training/prediction.
+    These features were chosen based on:
+    - Feature importance analysis
+    - Business relevance
+
+    Returns:
+        list[str]: List of feature names. Includes:
+        - Numerical: total_campaign_cost, campaign_duration, conversion_rate, acquisition_cost
+        - Categorical (encoded): customer_segment, product, campaign_type
+
+    Example usage:
+        >>> features = selected_features()
+        >>> X_train = data[features]
+    """
     features = ['total_campaign_cost',
                 'campaign_duration',
                 'conversion_rate',
@@ -109,8 +158,30 @@ def selected_features():
     return features
     
 def train_model():
-    data = load_and_preprocess_data()
+    """
+    Trains a Gradient Boosting Classifier to predict ROI categories (Low/Medium/High)
 
+    Steps:
+    1. Loads and preprocess data using load_and_preprocess_data()
+    2. Selects features and target variables (roi_category)
+    3. Splits data into train/test sets (80/20)
+    4. Creates a pipeline with:
+        - SMOTE for handling class imbalance
+        - Gradient Boosting Classifier with tuned hyperparameters
+        - Hyperparameters were optimised via GridSearchCV
+    5. Trains and returns the best model
+
+    Returns:
+        GradientBoostingClassifier: Trained model pipeline including SMOTE preprocessing
+    
+    Example usage:
+        >>> model = train_model()
+        >>> predictions = model.predict(X_new) # where X_new is a pd.Dataframe of features without target variable
+    """
+
+    # load and preprocess data - returns DataFrame with features and target variables
+    data = load_and_preprocess_data()
+    
     # select features and target variable (roi_category)
     X = data[selected_features()]
     y = data["roi_category"]
@@ -133,6 +204,20 @@ def train_model():
     return best_model
 
 def evaluate_model(model):
+    """
+    Evaluates the given classification model using a test dataset.
+
+    The function loads and preprocesses the data, selects relevant features, 
+    splits the data into training and test sets, and then evaluates the model's 
+    performance using a classification report.
+
+    Args:
+        model: A trained classification model with a `predict` method.
+
+    Returns:
+        None. The function prints a classification report showing precision, 
+        recall, F1-score, and support for each class.
+    """
     data = load_and_preprocess_data()
     X = data[selected_features()]
     y = data["roi_category"]
@@ -147,6 +232,18 @@ def evaluate_model(model):
     print(classification_report(y_test, y_pred, target_names=labels))
 
 def save_model():
+    """
+    Trains a model and saves it as a pickle file.
+
+    This function trains a model using the `train_model` function and saves 
+    the trained model to the /Saved folder in binary format using pickle.
+
+    Args:
+        None
+
+    Returns:
+        None. The function saves the model to disk and prints a confirmation message.
+    """
     model_path = "saved/b3-measuring-campaign-roi.pkl"
     model = train_model()
 
@@ -155,3 +252,9 @@ def save_model():
 
     print(f"Model trained and saved at {model_path}")
     
+### ONLY UNCOMMENT IF MODEL NEEDS TO BE RETRAINED
+##model = train_model()
+##evaluate_model(model)
+##
+### UNCOMMENT LINE IF MODEL IS SATISFACTORY AFTER EVALUATION
+##save_model()
