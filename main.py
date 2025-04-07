@@ -186,25 +186,22 @@ elif selected_page == "Analysis/Insights":
         col1, col2 = st.columns([2, 1], gap="medium")
         
         with col1:
-            st.subheader("🔍 Key Insights & Methodology")
-            st.markdown("""
-            - **ROI Prediction Model**: Gradient Boosting analysis of:
-                - Historical conversion patterns
-                - Multi-channel cost structures
-                - Engagement metrics
-            """)
-            
-            with st.expander("💡 Key Insights", expanded=False):
+            st.subheader("🔍 Key Insights")
+            with st.expander("⏰ Peak Timing", expanded=False):
                 st.markdown("""
-                - **Peak Timing**:
-                    - 📱 SMS campaigns: **Monday** effectiveness (2× avg. ROI)
-                    - 📲 App notifications: **Thursday** engagement peaks
-                - **High-Value Offers**:
-                    - 🏦 Mortgage promotions: highest conversion rates
-                    - 💼 Wealth Management: 3× ROI for retirees
+                - 📱 SMS campaigns: **Monday** effectiveness (2× avg. ROI)
+                - 📲 App notifications: **Thursday** engagement peaks
                 - **Engagement Paradox**: 35% of high-engagement campaigns underperformed on ROI
                 """)
-        
+            with st.expander("💸 High-Value Offers", expanded=False):
+                st.markdown("""
+                - 🏦 Mortgage promotions: highest conversion rates
+                - 💼 Wealth Management: 3× ROI for retirees
+                """)
+            with st.expander("⚛️ Engagement Paradox", expanded=False):
+                st.markdown("""
+                35% of high-engagement campaigns underperformed on ROI
+                """)
         with col2:
             st.markdown("""
             #### 🚀 Action Plan
@@ -408,35 +405,43 @@ elif selected_page == "Proposed Solution/ Deployment Strategy":
         - ↑ meaningful customer engagement
         """)
 
-    
-else:
-    st.markdown("""
-        <style>
-        div[data-testid="stMarkdownContainer"] p, 
-        div[data-testid="stMarkdownContainer"] li, 
-        div[data-testid="stMarkdownContainer"] ul {
-            font-size: 18pt !important;
-            line-height: 1.5 !important;
-            margin-bottom: 12px !important;
-        }
-        </style>
-        """, unsafe_allow_html=True)
+        
 
-    st.title("Conclusion")
+    st.divider()
+    st.divider()
+
+    st.header("🧠 AI-Powered Campaign ROI Optimisation Solution")
     st.markdown("---")
 
-    # Main Content Section
-    st.header("🏆 Banking Analytics Impact Summary")
-
-    # Revenue Growth Section
-    with st.expander("🎯 Revenue Growth Through Precision Engagement", expanded=False):
+    col1, col2 = st.columns([2,1], gap = "large")
+    
+    with col1:
+        with st.expander("**📉 Gradient Boosting Classification**", expanded=True):
+            st.markdown("""
+                - **Predict** the ROI outcome of campaigns before they are even rolled out
+                - Raw ROI values converted into distinct tiers
+                - Classes are Low 🔴, Medium 🟡 and High 🟢
+                """)
         st.markdown("""
-        - Higher conversion rates from segment-specific personalization
-        - Increase in CLV via predictive next-best-product recommendations
-        - Enhanced cross-selling opportunities through data-driven insights
+        #### ♟️ Campaign Optimisation Strategy
+        """)  
+        st.markdown("""
+            - Develop new, **personalised** campaigns based on derived insights
+            - Input parameters into model to obtain an early ROI prediction
+            - Result: Model output predicts potential ROI gains from campaign
+            - Low/Medium ROI 🔴: Re-evaluate campaign parameters
+            - High ROI 🟢: Roll out campaign, monitor performance for any red flags
+            """)
+
+    with col2:
+        st.markdown("""
+        #### 📈 Benefits of Pre-emptive ROI Prediction
         """)
-
-
+        st.success("""
+        - ⬇️ Lower risk of inefficient budget allocation towards unprofitable campaigns
+        - 💰 Maximize returns by focusing resources on campaigns with the highest predicted ROI
+        - ⚡ Classification nature of model enables immediate, actionable insights with regards to campaign planning
+        """)
 
 else:
     st.markdown("""
@@ -477,7 +482,7 @@ else:
     with st.expander("💪 Future-Proof Competitive Advantage", expanded=False):
         st.markdown("""
         - Real-time adaptation to shifting customer behaviors and market trends
-        - Continuous performance improvement through self-learning A/B testing frameworks
-        - Regulatory resilience with built-in privacy protections and compliance safeguards
+        - Regular model improvement through retraining on fresh campaign data
+        - Predict and prevent customer attrition to maintain edge over competitors
         """)
 
