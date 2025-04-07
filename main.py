@@ -288,6 +288,39 @@ elif selected_page == "Proposed Solution/ Deployment Strategy":
     
     # --- Real-Time Personalization Engine ---
     st.title("Proposed Solution/Deployment Strategy")
+    st.header("📦 Deployment and Implementation")
+    st.markdown("---")
+    st.markdown("""
+            #### 🐳 Docker Deployment Business Consideration
+            """)
+    with st.container():
+        
+        cols = st.columns(3)
+        
+        with cols[0]:
+            with st.expander("📈 Scalability", expanded=False):
+                st.markdown("""
+                            - Each model runs in its own container, allowing independent scaling based on real-time usage.
+                            - High-demand services (e.g., real-time segmentation) can scale without affecting other components.
+                            """)
+
+        with cols[1]:
+            with st.expander("💰 Cost-Efficiency", expanded=False):
+                st.markdown("""
+                            - Resources are allocated only to the services currently in demand, reducing idle compute time.
+                            - Modular structure minimizes infrastructure overhead and avoids unnecessary full-system scaling.
+                            """)
+
+        with cols[2]:
+            with st.expander("🔁 Long Term Adaptability", expanded=False):
+                st.markdown("""
+                            - Individual models can be updated, replaced, or retrained without disrupting the entire system.
+                            - Supports CI/CD practices for rapid iteration and deployment of improvements.
+                            """)
+                
+    st.divider()
+    st.divider()
+    
     st.header("📊 Smart Customer Segmentation Solution")
     st.markdown("---")
     with st.container():
