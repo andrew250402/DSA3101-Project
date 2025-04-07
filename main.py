@@ -6,13 +6,13 @@ from streamlit_utilities import read_csv, read_image, read_model
 
 
 st.set_page_config(
-    page_title="DSA3101 project",
+    page_title="Optibank",
     page_icon="💰",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+st.image(read_image("optibank_logo.png"))
 
-st.title("DSA3101 project")
 
 # Create sidebar for page navigation
 st.sidebar.title("Navigation")
@@ -55,14 +55,6 @@ if selected_page == "Introduction/Context":
         - **Missed cross-sell opportunities**  
         - **Unmitigated customer churn**  
         """)
-        
-        # Example metrics (bad)
-        st.markdown("**Typical Results:**")
-        data_traditional = pd.DataFrame({
-            "Metric": ["Conversion Rate", "Cost Per Acquisition", "Customer Retention"],
-            "Value": ["5%", "$50", "60%"]
-        })
-        st.table(data_traditional)
 
     # --- Right Side (AI-Powered Marketing) ---
     with col2:
@@ -78,13 +70,6 @@ if selected_page == "Introduction/Context":
         - **Improved customer loyalty**  
         """)
         
-        # Example metrics (improved)
-        st.markdown("**Expected Results:**")
-        data_ai = pd.DataFrame({
-            "Metric": ["Conversion Rate", "Cost Per Acquisition", "Customer Retention"],
-            "Value": ["15%", "$20", "85%"]
-        })
-        st.table(data_ai)
     # Split into two columns
     col1, col2 = st.columns(2)
     
@@ -109,7 +94,6 @@ if selected_page == "Introduction/Context":
 
     # Footer
     st.markdown("---")
-    st.caption("© 2024 Your Data Science Team | AI-Powered Marketing Optimization for Banks")
     
 
 elif selected_page == "Analysis/Insights":
@@ -187,20 +171,23 @@ elif selected_page == "Analysis/Insights":
         
         with col1:
             st.subheader("🔍 Key Insights")
+            
+            with st.expander("⚛️ Engagement Paradox", expanded=False):
+                st.markdown("""
+                35% of high-engagement campaigns underperformed on ROI
+                """)
+
+            with st.expander("💸 High-Value Offers", expanded=False):
+                st.markdown("""
+                - 👴 Wealth Management: 3× ROI from retirees
+                - 🏦 Mortgage promotions: highest conversion rates
+                """)
+
             with st.expander("⏰ Peak Timing", expanded=False):
                 st.markdown("""
                 - 📱 SMS campaigns: **Monday** effectiveness (2× avg. ROI)
                 - 📲 App notifications: **Thursday** engagement peaks
-                - **Engagement Paradox**: 35% of high-engagement campaigns underperformed on ROI
-                """)
-            with st.expander("💸 High-Value Offers", expanded=False):
-                st.markdown("""
-                - 🏦 Mortgage promotions: highest conversion rates
-                - 💼 Wealth Management: 3× ROI for retirees
-                """)
-            with st.expander("⚛️ Engagement Paradox", expanded=False):
-                st.markdown("""
-                35% of high-engagement campaigns underperformed on ROI
+                - 📧**Email**: Highest average conversion rate
                 """)
         with col2:
             st.markdown("""
@@ -208,9 +195,9 @@ elif selected_page == "Analysis/Insights":
             """)
             st.success("""
             **Budget Reallocation Strategy**
+            - 🕒 Implement day-specific channel outreach            
             - ⬆️ Boost retiree-focused wealth management
             - ⬇️ Reduce underperforming engagement campaigns
-            - 🕒 Implement day-specific channel outreach
             """)
     st.divider()
     st.divider()
@@ -362,6 +349,42 @@ elif selected_page == "Proposed Solution/ Deployment Strategy":
             .stContainer {background-color: #f5faff; border-radius: 10px; padding: 20px;}
             </style>
             """, unsafe_allow_html=True)
+        
+    st.divider()
+    st.divider()
+
+    st.header("🧠 AI-Powered Campaign ROI Optimisation Solution")
+    st.markdown("---")
+
+    col1, col2 = st.columns([2,1], gap = "large")
+    
+    with col1:
+        with st.expander("**📉 Gradient Boosting Classification**", expanded=True):
+            st.markdown("""
+                - **Predict** the ROI outcome of campaigns before they are even rolled out
+                - Raw ROI values converted into distinct tiers
+                - Classes are Low 🔴, Medium 🟡 and High 🟢
+                """)
+        st.markdown("""
+        #### ♟️ Campaign Optimisation Strategy
+        """)  
+        st.markdown("""
+            - Develop new, **personalised** campaigns based on derived insights
+            - Input parameters into model to obtain an early ROI prediction
+            - Result: Model output predicts potential ROI gains from campaign
+            - Low/Medium ROI 🔴: Re-evaluate campaign parameters
+            - High ROI 🟢: Roll out campaign, monitor performance for any red flags
+            """)
+
+    with col2:
+        st.markdown("""
+        #### 📈 Benefits of Pre-emptive ROI Prediction
+        """)
+        st.success("""
+        - ⬇️ Lower risk of inefficient budget allocation towards unprofitable campaigns
+        - 💰 Maximize returns by focusing resources on campaigns with the highest predicted ROI
+        - ⚡ Classification nature of model enables immediate, actionable insights with regards to campaign planning
+        """)
                 
     st.divider()
     st.divider()
@@ -405,43 +428,6 @@ elif selected_page == "Proposed Solution/ Deployment Strategy":
         - ↑ meaningful customer engagement
         """)
 
-        
-
-    st.divider()
-    st.divider()
-
-    st.header("🧠 AI-Powered Campaign ROI Optimisation Solution")
-    st.markdown("---")
-
-    col1, col2 = st.columns([2,1], gap = "large")
-    
-    with col1:
-        with st.expander("**📉 Gradient Boosting Classification**", expanded=True):
-            st.markdown("""
-                - **Predict** the ROI outcome of campaigns before they are even rolled out
-                - Raw ROI values converted into distinct tiers
-                - Classes are Low 🔴, Medium 🟡 and High 🟢
-                """)
-        st.markdown("""
-        #### ♟️ Campaign Optimisation Strategy
-        """)  
-        st.markdown("""
-            - Develop new, **personalised** campaigns based on derived insights
-            - Input parameters into model to obtain an early ROI prediction
-            - Result: Model output predicts potential ROI gains from campaign
-            - Low/Medium ROI 🔴: Re-evaluate campaign parameters
-            - High ROI 🟢: Roll out campaign, monitor performance for any red flags
-            """)
-
-    with col2:
-        st.markdown("""
-        #### 📈 Benefits of Pre-emptive ROI Prediction
-        """)
-        st.success("""
-        - ⬇️ Lower risk of inefficient budget allocation towards unprofitable campaigns
-        - 💰 Maximize returns by focusing resources on campaigns with the highest predicted ROI
-        - ⚡ Classification nature of model enables immediate, actionable insights with regards to campaign planning
-        """)
 
 else:
     st.markdown("""
