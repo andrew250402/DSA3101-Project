@@ -299,7 +299,7 @@ elif selected_page == "Proposed Solution/ Deployment Strategy":
             #### 🧠 Dynamic Clustering Framework
             """)
             
-            with st.expander("📊 Data Processing Architecture", expanded=True):
+            with st.expander("📊 Data Processing Architecture", expanded=False):
                 st.markdown("""
                             - **Initial Data Clustering**: Hierarchical clustering for segment identification
                             - **Real-time Data Processing**: Incremental PCA for updating insights
@@ -317,38 +317,40 @@ elif selected_page == "Proposed Solution/ Deployment Strategy":
             """)
     st.markdown("---")
     with st.container():
-        st.subheader("🚀 Recommended Segment Approaches")
-        cols = st.columns(3)
-            
-        with cols[0]:
+        
+        with st.expander("🚀 Recommended Segment Approaches", expanded=False):
+        
+            cols = st.columns(3)
+                
+            with cols[0]:
+                st.markdown("""
+                **👴 Conservative Savers**
+                - Retirement planning workshops
+                - CD ladder strategies
+                - Estate planning services
+                """)
+                
+            with cols[1]:
+                st.markdown("""
+                **👔 High-Value Customers**
+                - Private banking offers
+                - Personal loans with lower rates
+                - Priority concierge service
+                """)
+                
+            with cols[2]:
+                st.markdown("""
+                **💳 Everyday Spenders**
+                - Cashback boost campaigns
+                - Introduce entry-level investment tools
+                - Personalised mobile app features
+                """)
+                
             st.markdown("""
-            **👴 Conservative Savers**
-            - Retirement planning workshops
-            - CD ladder strategies
-            - Estate planning services
-            """)
-            
-        with cols[1]:
-            st.markdown("""
-            **👔 High-Value Customers**
-            - Private banking offers
-            - Personal loans with lower rates
-            - Priority concierge service
-            """)
-            
-        with cols[2]:
-            st.markdown("""
-            **💳 Everyday Spenders**
-            - Cashback boost campaigns
-            - Introduce entry-level investment tools
-            - Personalised mobile app features
-            """)
-            
-        st.markdown("""
-            <style>
-            .stContainer {background-color: #f5faff; border-radius: 10px; padding: 20px;}
-            </style>
-            """, unsafe_allow_html=True)
+                <style>
+                .stContainer {background-color: #f5faff; border-radius: 10px; padding: 20px;}
+                </style>
+                """, unsafe_allow_html=True)
         
     st.divider()
     st.divider()
@@ -359,7 +361,7 @@ elif selected_page == "Proposed Solution/ Deployment Strategy":
     col1, col2 = st.columns([2,1], gap = "large")
     
     with col1:
-        with st.expander("**📉 Gradient Boosting Classification**", expanded=True):
+        with st.expander("**📉 Gradient Boosting Classification**", expanded=False):
             st.markdown("""
                 - **Predict** the ROI outcome of campaigns before they are even rolled out
                 - Raw ROI values converted into distinct tiers
@@ -395,7 +397,7 @@ elif selected_page == "Proposed Solution/ Deployment Strategy":
 
     col1, col2 = st.columns([2, 1], gap="large")
     with col1:
-        with st.expander("**📉 Logistic Model Churn Prediction**", expanded=True):
+        with st.expander("**📉 Logistic Model Churn Prediction**", expanded=False):
             st.markdown("""
                 - Churn risk prediction
                 - Early warning system
