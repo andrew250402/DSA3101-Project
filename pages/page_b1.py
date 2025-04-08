@@ -2,25 +2,40 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.multioutput import ClassifierChain
-from sklearn.metrics import classification_report, hamming_loss, make_scorer, f1_score
-from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.ensemble import RandomForestClassifier  # Using RandomForest instead of XGBoost
 import os
+import pickle
+
+from sklearn.multioutput import ClassifierChain
+from sklearn.metrics import classification_report, hamming_loss
 from mlxtend.frequent_patterns import apriori
 
 # Configure the page
 st.set_page_config(page_title="Bank Product Recommendation", layout="wide")
 
 # Sidebar Page Navigation
-page = st.sidebar.selectbox("Select Page", ["Project Flow", "Model Performance", "Apriori Analysis","Product Recommendation"])
+page = st.sidebar.selectbox("Select Page", ["Project Flow", "Model Performance", "Apriori Analysis", "Product Recommendation"])
 
 # Path Setup
 base_dir = os.path.dirname(os.path.abspath(__file__))
 csv_path = os.path.join(base_dir, "..", "data", "customer_data_with_labels_only.csv")
+model_path = os.path.join(base_dir, "..", "models", "saved", "multi_label_model.pkl")
 
-@st.cache_data
-def load_and_train_model():
+@st.cache_resource
+def load_pretrained_model():
+    # Load model
+    with open(model_path, "rb") as f:
+        model = pickle.load(f)
+
+    # ------------------------------------
+    # Step 2: Patch missing `monotonic_cst` if needed
+    # ------------------------------------
+    for estimator in model.estimators_:
+        if hasattr(estimator, "estimators_"):  # i.e., RandomForest inside ClassifierChain
+            for tree in estimator.estimators_:
+                if not hasattr(tree, "monotonic_cst"):
+                    tree.monotonic_cst = None  # ✅ patch fix here
+
+    # Load and preprocess data
     df = pd.read_csv(csv_path)
     if "customer_id" in df.columns:
         df.drop("customer_id", axis=1, inplace=True)
@@ -30,17 +45,17 @@ def load_and_train_model():
         "investment_product", "auto_loan", "wealth_management"
     ]
     categorical_cols = ["job", "marital", "education", "cluster", "region"]
-
-    # One-hot encode categorical variables
     df = pd.get_dummies(df, columns=categorical_cols, drop_first=True)
     df[product_cols] = df[product_cols].astype(bool)
-    
-    # Calculate days since account creation and drop the original date column
-    df["days_since_acc_created"] = (pd.Timestamp.now() - pd.to_datetime(df["created_at"])) / pd.Timedelta(days=1)
+
+    # Create time-based feature
+    df["days_since_acc_created"] = (
+        pd.Timestamp.now() - pd.to_datetime(df["created_at"])
+    ) / pd.Timedelta(days=1)
     df.drop("created_at", axis=1, inplace=True)
 
-    # Create new features based on frequent product bundles
-    frequent_bundles = [
+    # Create bundle features
+    bundles = [
         ['credit_card', 'personal_loan'],
         ['credit_card', 'savings_account'],
         ['auto_loan', 'credit_card'],
@@ -48,57 +63,37 @@ def load_and_train_model():
         ['auto_loan', 'savings_account'],
         ['auto_loan', 'credit_card', 'savings_account']
     ]
-    for bundle in frequent_bundles:
+    for bundle in bundles:
         name = 'bundle_' + '_'.join(sorted(bundle))
         df[name] = df[bundle].all(axis=1)
-    product_cols += ['bundle_' + '_'.join(sorted(b)) for b in frequent_bundles]
+    bundle_cols = ['bundle_' + '_'.join(sorted(b)) for b in bundles]
+    product_cols += bundle_cols
 
-    # Define feature columns and fill missing values
     feature_cols = [col for col in df.columns if col not in product_cols]
-    df[feature_cols] = df[feature_cols].fillna(method="ffill")
+    df[feature_cols] = df[feature_cols].ffill()
+
     X = df[feature_cols]
     y = df[product_cols]
+    X_test, y_test = X.sample(frac=0.2, random_state=42), y.sample(frac=0.2, random_state=42)
+    y_pred = model.predict(X_test)
+    y_prob = model.predict_proba(X_test)
 
-    # Split into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    return model, X, y, X_test, y_test, y_pred, y_prob, feature_cols, product_cols
 
-    # Initialize RandomForest as base estimator
-    base_clf = RandomForestClassifier(random_state=42)
-    chain = ClassifierChain(base_estimator=base_clf, random_state=42)
+(best_model, X_all, y_all, X_test, y_test, y_pred, y_prob, feature_cols, product_cols) = load_pretrained_model()
 
-    # Define a scorer and hyperparameter grid specific to RandomForest
-    scorer = make_scorer(f1_score, average="macro")
-    param_grid = {
-        'base_estimator__n_estimators': [50, 100],
-        'base_estimator__max_depth': [None, 5, 10],
-        'base_estimator__min_samples_split': [2, 5]
-    }
-
-    # Grid search with cross-validation
-    grid = GridSearchCV(chain, param_grid=param_grid, scoring=scorer, cv=3, verbose=0, n_jobs=-1)
-    grid.fit(X_train, y_train)
-
-    best_model = grid.best_estimator_
-    y_pred = best_model.predict(X_test)
-    y_prob = best_model.predict_proba(X_test)
-
-    return best_model, X, y, X_test, y_test, y_pred, y_prob, feature_cols, product_cols, grid
-
-(best_model, X_all, y_all, X_test, y_test, y_pred, y_prob, feature_cols, product_cols, grid) = load_and_train_model()
 
 # ---------------------------
 # Page 1: Product Recommendation
 # ---------------------------
 if page == "Product Recommendation":
     st.title("🔮 Customer Product Recommendation Form")
-    
-    # Define options for dropdowns
+
     jobs = ['admin', 'technician', 'services', 'management', 'unemployed', 'blue-collar', 'entrepreneur', 'self-employed', 'student', 'retired']
     maritals = ['married', 'single', 'divorced']
     educations = ['primary', 'secondary', 'tertiary']
     regions = ['Urban', 'Suburban', 'Rural']
-    
-    # Create a form for user input
+
     with st.form("customer_form"):
         st.subheader("Basic Information")
         col1, col2 = st.columns(2)
@@ -108,13 +103,13 @@ if page == "Product Recommendation":
             tenure = st.slider("Tenure (years)", 0, 30, 5)
         with col2:
             days_since_acc_created = st.slider("Days Since Account Created", 0, 10000, 1000)
-    
+
         st.subheader("Demographics")
         job = st.selectbox("Job", options=jobs)
         marital = st.selectbox("Marital Status", options=maritals)
         education = st.selectbox("Education", options=educations)
         region = st.selectbox("Region", options=regions)
-    
+
         st.subheader("Financial Products (Already Owned)")
         col3, col4, col5 = st.columns(3)
         with col3:
@@ -128,11 +123,10 @@ if page == "Product Recommendation":
         with col5:
             savings_account = st.radio("Has Savings Account", options=["no", "yes"])
             investment_product = st.radio("Has Investment Product", options=["no", "yes"])
-    
+
         submitted = st.form_submit_button("🎯 Predict Recommended Products")
-    
+
     if submitted:
-        # Build input dictionary from form data
         input_dict = {
             "age": age,
             "income": income,
@@ -148,7 +142,7 @@ if page == "Product Recommendation":
             "investment_product": 1 if investment_product == "yes" else 0,
         }
 
-        # One-hot encode categorical fields based on training feature columns
+        # One-hot encode categorical fields
         for col in feature_cols:
             if col.startswith("job_") and col == f"job_{job}":
                 input_dict[col] = 1
@@ -161,30 +155,25 @@ if page == "Product Recommendation":
             elif col not in input_dict:
                 input_dict[col] = 0
 
-        # Prepare input DataFrame ensuring the same column order as in training
         input_df = pd.DataFrame([input_dict])[feature_cols]
 
-        # Predict probabilities for each product
-        probs = best_model.predict_proba(input_df)  
-        # Extract the single row of probabilities
+        probs = best_model.predict_proba(input_df)
         prob_vector = probs[0]
 
-        # Create a DataFrame mapping each product to its probability
         result_df = pd.DataFrame({
-            "Product": product_cols,   # Assumes product_cols order matches the model's output
+            "Product": product_cols,
             "Probability": prob_vector
         }).sort_values(by="Probability", ascending=False)
 
-        # Split products into individual and bundle categories
-        result_individual = result_df[~result_df["Product"].str.startswith("bundle")].reset_index(drop=True)
-        result_bundle = result_df[result_df["Product"].str.startswith("bundle")].reset_index(drop=True)
+        result_individual = result_df[~result_df["Product"].str.startswith("bundle")]["Product"]
+        result_bundle = result_df[result_df["Product"].str.startswith("bundle")]["Product"]
 
-        # Display two separate tables
         st.subheader("Individual Products")
         st.dataframe(result_individual)
 
         st.subheader("Bundled Products")
         st.dataframe(result_bundle)
+
 
 elif page == "Model Performance":
     st.title("📈 Model Training and Test Results")
@@ -312,6 +301,10 @@ elif page == "Project Flow":
 
 
 
+
+
+
+
     st.graphviz_chart(flow_diagram)
 
     st.markdown("### Detailed Process Description")
@@ -347,12 +340,4 @@ elif page == "Project Flow":
 
     st.markdown(
         "This systematic approach ensures that insights from **association rule mining** are effectively integrated with **predictive modeling** to enhance the product recommendation process."
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
     )
-=======
-    )
->>>>>>> Stashed changes
-=======
-    )
->>>>>>> Stashed changes
