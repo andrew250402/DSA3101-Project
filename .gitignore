@@ -1,0 +1,4 @@
+__pychache__/
+*.pyc
+myvenv
+.DS_Store

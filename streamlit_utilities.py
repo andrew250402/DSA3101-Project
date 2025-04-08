@@ -5,7 +5,7 @@ import pickle
 
 def read_csv(filename):
     """
-    Read CSV file from 'Data DSA3101' folder
+    Read CSV file from 'data' folder
     
     Args:
         filename (str): Name of the CSV file
@@ -13,12 +13,12 @@ def read_csv(filename):
     Returns:
         pandas.DataFrame: Dataframe containing CSV data
     """
-    path = os.path.join('Data DSA3101', filename)
+    path = os.path.join('data', filename)
 
     if os.path.exists(path):
         return pd.read_csv(path)
 
-    raise FileNotFoundError(f"Could not find {filename} in Data DSA3101 directory")
+    raise FileNotFoundError(f"Could not find {filename} in data directory")
 
 
 def read_image(filename):
