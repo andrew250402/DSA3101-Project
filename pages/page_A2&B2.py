@@ -1,6 +1,7 @@
 import streamlit as st
-from streamlit_utilities import read_csv, read_image, read_model
 import pandas as pd
+import plotly.express as px
+from streamlit_utilities import read_csv, read_image, read_model
 
 # Load data
 customer_engagement_df = read_csv('customer_engagement.csv')
@@ -112,6 +113,40 @@ if selected_page == "A2":
     """)
     st.write("***")
 
+    # Define function to calculate weighted metrics
+    def weighted_metrics(df):
+        total_delivered = df["delivered"].sum()
+        if total_delivered == 0:  # Avoid division by zero
+            return pd.Series({"conversion_rate": 0, "click_through_rate": 0, "open_rate": 0})
+    
+        return pd.Series({
+            "conversion_rate": (df["conversion_status"] * df["delivered"]).sum() / total_delivered,
+            "click_through_rate": (df["clicked"] * df["delivered"]).sum() / total_delivered,
+            "open_rate": (df["opened"] * df["delivered"]).sum() / total_delivered,
+        })
+    a2_data = read_csv('A2_metrics.csv')
+    a2_data.rename(columns={"engagement_day": "day"}, inplace=True)
+    engagement_metrics = ['click_through_rate', 'conversion_rate', 'open_rate']
+    x_metrics = ['day', 'channel', 'recommended_product_name', 'cluster']
+    y_metric = st.selectbox("Y-axis metric", options=engagement_metrics)
+    x_metric = st.selectbox("X-axis metric", options=x_metrics)
+    colour_options = ["None"] + [m for m in x_metrics if m != x_metric and m != "cluster"]
+    color_by = st.selectbox("Color by", options=colour_options)
+    # Groupby based on color_by (if selected)
+    group_cols = [x_metric] if color_by == "None" else [x_metric, color_by]
+    new_df = a2_data.groupby(group_cols).apply(weighted_metrics).reset_index()
+    day_labels = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    if x_metric == "day" or color_by == "day":
+        new_df["day"] = new_df["day"].map(lambda x: day_labels[x])
+    fig = px.bar(
+        new_df,
+        x=x_metric,
+        y=y_metric,
+        color=None if color_by == "None" else color_by,
+        barmode="group",
+        title=f"{y_metric} by {x_metric}" + (f" & {color_by}" if color_by != "None" else "")
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
     st.subheader("Conclusion")
 
