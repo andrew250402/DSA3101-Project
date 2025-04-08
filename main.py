@@ -483,27 +483,28 @@ else:
     # Main Content Section
     st.header("🏆 Banking Analytics Impact Summary")
 
-    # Revenue Growth Section
-    with st.expander("🎯 Revenue Growth Through Precision Engagement", expanded=False):
+    # Issues with Current Bank's Marketing approach
+    with st.expander("**📉 The Limitations of Traditional Banking Marketing**", expanded=False):
         st.markdown("""
-        - Higher conversion rates from segment-specific personalization
-        - Increase in CLV via predictive next-best-product recommendations
-        - Enhanced cross-selling opportunities through data-driven insights
+        - Traditional bank marketing approaches struggle to keep up with current trends, shifting behaviours
+        - Generic campaigns, inefficient strategies and segmentation
+        - Leads to missed opportunities, weaker retention and declining ROI
         """)
 
-    # Cost Efficiency Section
-    with st.expander("📈 Cost Efficiency & Resource Optimization", expanded=False):
+    # AI-Powered Marketing Solution
+    with st.expander("**🚀 AI-Driven Marketing: The Path Forward**", expanded=False):
         st.markdown("""
-        - Reduction in wasted ad spend through AI-driven budget allocation
-        - Lower customer acquisition costs via improved targeting accuracy
-        - Relieves the need for manual segmentation through automated clustering
+        - Our solution leverages AI advanced segmentation, predictive analytics, and dynamic optimization
+        - Offers a clear blueprint for campaign personalisation and marketing strategy
+        - Phased implementation ensures short-term impacts and long-term scalability
         """)
 
     # Competitive Advantage Section
-    with st.expander("💪 Future-Proof Competitive Advantage", expanded=False):
+    with st.expander("**💪 Building a Robust, Self-Optimizing Growth Engine**", expanded=False):
         st.markdown("""
-        - Real-time adaptation to shifting customer behaviors and market trends
-        - Regular model improvement through retraining on fresh campaign data
-        - Predict and prevent customer attrition to maintain edge over competitors
+        - Our solution isn't just another marketing tool - it's a self-optimising AI growth engine
+        - Banks can expect unprecedented profitability through continuous optimisation
+        - Future-ready AI infrastructure for hyper-personalisation at scale
+        - Transforms ordinary banks into responsive, relevant and relentlessly profitable institutions
         """)
 
