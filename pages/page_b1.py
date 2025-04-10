@@ -165,14 +165,49 @@ if page == "Product Recommendation":
             "Probability": prob_vector
         }).sort_values(by="Probability", ascending=False)
 
-        result_individual = result_df[~result_df["Product"].str.startswith("bundle")]["Product"]
+        result_individual = result_df[~result_df["Product"].str.startswith("bundle")]
         result_bundle = result_df[result_df["Product"].str.startswith("bundle")]["Product"]
 
+        # Get all products user already owns
+        owned_products = []
+        if credit_card == 'yes': owned_products.append('credit_card')
+        if personal_loan == 'yes': owned_products.append('personal_loan')
+        if mortgage == 'yes': owned_products.append('mortgage')
+        if savings_account == 'yes': owned_products.append('savings_account')
+        if investment_product == 'yes': owned_products.append('investment_product')
+        if auto_loan == 'yes': owned_products.append('auto_loan')
+        if wealth_management == 'yes': owned_products.append('wealth_management')
+
+                # Convert result_bundle to a list of bundle names
+        bundle_names = result_df[result_df["Product"].str.startswith("bundle")]["Product"].tolist()
+
+        # Define bundles mapping
+        bundle_mapping = {
+            'bundle_credit_card_personal_loan': ['credit_card', 'personal_loan'],
+            'bundle_credit_card_savings_account': ['credit_card', 'savings_account'],
+            'bundle_auto_loan_credit_card': ['auto_loan', 'credit_card'],
+            'bundle_personal_loan_savings_account': ['personal_loan', 'savings_account'],
+            'bundle_auto_loan_savings_account': ['auto_loan', 'savings_account'],
+            'bundle_auto_loan_credit_card_savings_account': ['auto_loan', 'credit_card', 'savings_account']
+        }
+
+        # Filter out bundles if the user already owns all items in that bundle
+        filtered_bundle_names = [
+            b for b in bundle_names if not all(p in owned_products for p in bundle_mapping[b])
+        ]
+
+        # Rebuild the filtered bundle DataFrame
+        result_bundle = result_df[result_df["Product"].isin(filtered_bundle_names)]["Product"]
+
+
+        # Filter them out
+        result_individual = result_individual[~result_individual["Product"].isin(owned_products)]["Product"]
+
         st.subheader("Individual Products")
-        st.dataframe(result_individual)
+        st.dataframe(result_individual.reset_index(drop=True), use_container_width=True)
 
         st.subheader("Bundled Products")
-        st.dataframe(result_bundle)
+        st.dataframe(result_bundle.reset_index(drop=True), use_container_width=True)
 
 
 elif page == "Model Performance":
